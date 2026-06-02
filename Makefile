@@ -88,7 +88,10 @@ DRIVER_SRCS := \
     src/drivers/scpi_psu/scpi_psu.c \
     src/drivers/korad/korad.c \
     src/drivers/owon_xdm/owon_xdm.c \
-    src/drivers/scpi_dmm/scpi_dmm.c
+    src/drivers/scpi_dmm/scpi_dmm.c \
+    src/drivers/hp_3458a/hp_3458a.c \
+    src/drivers/hp_3478a/hp_3478a.c \
+    src/drivers/hp_6620_family/hp_6620_family.c
 
 VIEW_SRCS := \
     src/views/registry.c \

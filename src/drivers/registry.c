@@ -2,6 +2,9 @@
 
 #include "demo.h"
 #include "dmm_demo.h"
+#include "hp_3458a/hp_3458a.h"
+#include "hp_3478a/hp_3478a.h"
+#include "hp_6620_family/hp_6620_family.h"
 #include "korad/korad.h"
 #include "modbus_bridge/modbus_bridge.h"
 #include "owon_xdm/owon_xdm.h"
@@ -43,6 +46,13 @@ static const psu_driver_factory_t *const k_psu_drivers[] = {
     &hp_6633a_factory,
     &hp_6634a_factory,
 
+    /* Native HP-IB DCL (NOT SCPI) — HP 6620-series System DC Sources. */
+    &hp_6622a_factory,
+    &hp_6623a_factory,
+    &hp_6624a_factory,
+    &hp_6625a_factory,
+    &hp_6627a_factory,
+
     /* Non-SCPI text protocols. */
     &korad_ka_factory,
 
@@ -83,6 +93,11 @@ static const dmm_driver_factory_t *const k_dmm_drivers[] = {
     /* SCPI DMMs — Keithley / Tektronix. */
     &keithley_2000_factory,
     &keithley_dmm6500_factory,
+
+    /* Native HP-IB DCL (NOT SCPI). */
+    &hp_3458a_factory,         /* 8½-digit reference */
+    &hp_3457a_factory,         /* 6½-digit predecessor */
+    &hp_3478a_factory,         /* 5½-digit, F-command set */
 
     &dmm_demo_factory,
 };

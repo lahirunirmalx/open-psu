@@ -101,6 +101,11 @@ greyed out for modes the driver doesn't expose.
 | `hp-6632a`        | Classic HP/Agilent 6632A single output 20V/5A                                     | SCPI over USB-serial **or** Prologix GPIB |
 | `hp-6633a`        | Classic HP/Agilent 6633A single output 50V/2A                                     | SCPI over USB-serial **or** Prologix GPIB |
 | `hp-6634a`        | Classic HP/Agilent 6634A single output 100V/1A                                    | SCPI over USB-serial **or** Prologix GPIB |
+| `hp-6622a`        | HP 6622A System DC Source — 2 × 50V/2A                                            | **Native HP-IB DCL** via Prologix GPIB    |
+| `hp-6623a`        | HP 6623A System DC Source — 20V/2A x2 + 50V/0.8A                                  | **Native HP-IB DCL** via Prologix GPIB    |
+| `hp-6624a`        | HP 6624A System DC Source — 7V/5A x2 + 20V/2A x2                                  | **Native HP-IB DCL** via Prologix GPIB    |
+| `hp-6625a`        | HP 6625A System DC Source — 2 × 50V/1A high-power                                 | **Native HP-IB DCL** via Prologix GPIB    |
+| `hp-6627a`        | HP 6627A System DC Source — 4 × 50V/2A                                            | **Native HP-IB DCL** via Prologix GPIB    |
 | `korad-ka`        | Korad KA-protocol — Korad / TENMA / Velleman / Hanmatek / RND clones              | USB serial (no-terminator text)           |
 | `demo`            | Synthetic 2-channel PSU — animated values, no hardware required                   | none                                      |
 
@@ -117,6 +122,9 @@ greyed out for modes the driver doesn't expose.
 | `fluke-8846a`       | Fluke 8846A — 6½-digit with 4-wire ohms                                                  | SCPI over USB-serial **or** Prologix GPIB |
 | `keithley-2000`     | Keithley 2000 — legacy 6½-digit; typically GPIB                                          | SCPI over USB-serial **or** Prologix GPIB |
 | `keithley-dmm6500`  | Keithley DMM6500 Touch — auto-switches to SCPI mode on open                              | SCPI over USB-serial **or** Prologix GPIB |
+| `hp-3458a`          | HP 3458A — 8½-digit reference DMM                                                        | **Native HP-IB DCL** via Prologix GPIB    |
+| `hp-3457a`          | HP 3457A — 6½-digit predecessor (same DCL command set)                                   | **Native HP-IB DCL** via Prologix GPIB    |
+| `hp-3478a`          | HP 3478A — 5½-digit, native F-command set (no `*IDN?`)                                   | **Native HP-IB DCL** via Prologix GPIB    |
 | `dmm-demo`          | Synthetic 6½-digit DMM — animated reading, no hardware                                   | none                                      |
 
 Run `./psu_app --list` to see this list with descriptions and defaults.

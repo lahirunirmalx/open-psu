@@ -34,6 +34,14 @@ src/
                                   Works over either USB-serial or Prologix GPIB transport.
     korad/                        Korad KA-protocol PSU driver — Korad / TENMA / Velleman / Hanmatek / clones.
       korad.{c,h}
+    hp_3458a/                     HP DCL DMM core — profile-driven. Ships hp-3458a
+      hp_3458a.{c,h}                (8½-digit reference) + hp-3457a (6½-digit predecessor).
+                                  DCV/ACV/OHM/OHMF + TARM SGL trigger model. GPIB-only.
+    hp_3478a/                     HP 3478A — 5½-digit DMM, single-letter F-command
+      hp_3478a.{c,h}                protocol (F1=DCV, R5=range, T3=single trigger). GPIB-only.
+    hp_6620_family/               HP 6620-series System DC Sources — native HP-IB DCL,
+      hp_6620_family.{c,h}          NOT SCPI. Ships hp-6622a / 6623a / 6624a / 6625a / 6627a
+                                  factories. VSET/ISET/OUT/VOUT?/IOUT? command set. GPIB-only.
     owon_xdm/                     OWON XDM-series DMM driver — SCPI over USB serial.
       owon_xdm.{c,h}              Supports XDM1041/1241/2041 (+XDM3000 if SCPI-compatible).
     scpi_dmm/                     One DMM driver, many SCPI profiles. Currently shipped:
