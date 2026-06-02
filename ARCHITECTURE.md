@@ -63,9 +63,20 @@ src/
     serial_port.{c,h}             POSIX serial helper (termios).
     serial_port_win32.c           Native Win32 alternative (CreateFile + SetCommState +
                                   ReadFile/WriteFile). Makefile picks one per OS.
-    scpi.{c,h}                    SCPI client API + port-spec parser (serial:/prologix: schemes).
+    scpi.{c,h}                    SCPI client API + port-spec parser. Schemes:
+                                    serial: / prologix: / usbtmc: / vxi11: / hislip:
     scpi_serial.c                 SCPI transport: direct USB-serial.
     scpi_prologix.c               SCPI transport: Prologix GPIB-USB-HPIB controller.
+    scpi_usbtmc.c                 SCPI transport: USB-TMC. Linux uses /dev/usbtmcN via
+                                    the kernel `usbtmc` module; libusb-1.0 path
+                                    handles vid:pid form (cross-platform).
+    scpi_vxi11.c                  SCPI transport: VXI-11 over TCP. Hand-rolled ONC RPC /
+                                    XDR (no external dep) — portmap GETPORT → CREATE_LINK
+                                    → DEVICE_WRITE/READ → DESTROY_LINK.
+    scpi_hislip.c                 SCPI transport: HiSLIP IVI-6.1 binary protocol on
+                                    TCP 4880. v1: Initialize + Data/DataEnd only.
+    net_io.{c,h}                  Tiny cross-platform TCP helper (Linux/POSIX +
+                                    Winsock2) used by scpi_vxi11.c and scpi_hislip.c.
 
   views/
     views.h                       view_def_t + dmm_view_def_t + entry-point declarations.

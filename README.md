@@ -141,8 +141,41 @@ serial:/dev/ttyUSB0                # direct USB-serial (default baud)
 serial:/dev/ttyUSB0:9600           # with explicit baud override
 prologix:/dev/ttyUSB0:5            # Prologix GPIB-USB-HPIB controller, GPIB addr 5
 prologix:/dev/ttyUSB0:5:115200     # with explicit Prologix-port baud
+usbtmc:/dev/usbtmc0                # Linux kernel usbtmc driver
+usbtmc:1ab1:0588                   # libusb USB-TMC (Linux/macOS/Windows) — <vid>:<pid>
+usbtmc:1ab1:0588:DM3R234509999     # libusb USB-TMC, match by serial number too
+vxi11:192.168.1.10                 # VXI-11 LAN (default device "inst0")
+vxi11:scope.local:gpib0,5          # VXI-11, custom device name
+hislip:192.168.1.10                # HiSLIP LAN, default port 4880 / sub-addr "hislip0"
+hislip:192.168.1.10:4880:hislip0   # fully-specified HiSLIP
 /dev/ttyUSB0                       # shorthand → serial:/dev/ttyUSB0
 ```
+
+### USB-TMC notes
+
+- **Linux native** (`usbtmc:/dev/usbtmc0`): the kernel's `usbtmc` module
+  exposes the instrument as a regular character device. Add a udev rule
+  if non-root users need access:
+  `SUBSYSTEM=="usbmisc", KERNEL=="usbtmc*", MODE="0660", GROUP="plugdev"`.
+- **libusb** (`usbtmc:<vid>:<pid>`): cross-platform. On Linux just install
+  `libusb-1.0-0-dev`. On Windows, run **Zadig** once per instrument to
+  bind the WinUSB driver to the instrument's USB-TMC interface, then the
+  same `usbtmc:1ab1:0588`-style spec works. On macOS, install libusb via
+  Homebrew (`brew install libusb`).
+- Build-time auto-detect: if `pkg-config --exists libusb-1.0` succeeds the
+  libusb backend gets compiled in (`-DHAVE_LIBUSB`); otherwise only the
+  Linux kernel-driver path is available.
+
+### LAN transports
+
+- **VXI-11**: TCP-based ONC RPC. Every LAN-capable bench instrument from
+  Keysight/Rigol/Siglent/R&S/Tek/Keithley supports it. Reach via
+  `vxi11:<host>` — the default device name `inst0` works for almost
+  everything; pass a custom device name (`gpib0,5`, `usb0[...]`, etc.)
+  for multi-instrument LAN-GPIB gateways.
+- **HiSLIP**: the newer IVI-6.1 LAN protocol; binary-framed on TCP
+  port 4880. Modern instruments support both VXI-11 and HiSLIP; HiSLIP
+  is recommended where available (lower latency, cleaner error model).
 
 Non-SCPI drivers (modbus-bridge, korad-ka) just take the bare device path.
 

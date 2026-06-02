@@ -94,7 +94,44 @@ scpi_t *scpi_open(const char *port_spec, int default_baud) {
         return scpi_prologix_open(device, baud, addr);
     }
 
+    if (strcmp(scheme, "usbtmc") == 0) {
+        /* Pass the whole remainder verbatim — the USB-TMC backend handles
+         * both "/dev/usbtmc0" and "<vid>:<pid>[:<serial>]" forms and the
+         * vid:pid form has its own colon-separators to preserve. */
+        if (!p || !*p) {
+            fprintf(stderr, "scpi: usbtmc:<dev>|<vid>:<pid>[:<serial>] — missing target\n");
+            return NULL;
+        }
+        return scpi_usbtmc_open(p);
+    }
+
+    if (strcmp(scheme, "vxi11") == 0) {
+        char host[128] = {0};
+        char dev[64]   = {0};
+        if (!next_field(&p, host, sizeof(host)) || !*host) {
+            fprintf(stderr, "scpi: vxi11:<host>[:<device>] — missing host\n");
+            return NULL;
+        }
+        next_field(&p, dev, sizeof(dev));    /* optional device name */
+        return scpi_vxi11_open(host, dev[0] ? dev : NULL);
+    }
+
+    if (strcmp(scheme, "hislip") == 0) {
+        char host[128]  = {0};
+        char port_s[16] = {0};
+        char sub[64]    = {0};
+        if (!next_field(&p, host, sizeof(host)) || !*host) {
+            fprintf(stderr, "scpi: hislip:<host>[:<port>][:<sub-address>] — missing host\n");
+            return NULL;
+        }
+        next_field(&p, port_s, sizeof(port_s));   /* optional port */
+        next_field(&p, sub,    sizeof(sub));      /* optional sub-address */
+        int port = port_s[0] ? atoi(port_s) : 0;
+        return scpi_hislip_open(host, port, sub[0] ? sub : NULL);
+    }
+
     fprintf(stderr, "scpi: unknown transport scheme '%s' "
-                    "(expected serial: or prologix:)\n", scheme);
+                    "(expected serial: / prologix: / usbtmc: / vxi11: / hislip:)\n",
+            scheme);
     return NULL;
 }

@@ -52,6 +52,18 @@ ifeq ($(strip $(SDL_LIBS)),)
 SDL_LIBS := -lSDL2 -lSDL2_ttf
 endif
 
+# ----- libusb detection (optional — enables userspace USB-TMC) -----------
+
+# When libusb-1.0 is present (Linux: libusb-1.0-0-dev; MSYS2:
+# mingw-w64-x86_64-libusb), the userspace USB-TMC backend gets compiled in.
+# Without it the kernel-driver path on Linux still works; Windows users
+# need libusb for any USB-TMC access.
+USB_CFLAGS := $(shell pkg-config --cflags libusb-1.0 2>/dev/null)
+USB_LIBS   := $(shell pkg-config --libs   libusb-1.0 2>/dev/null)
+ifneq ($(strip $(USB_LIBS)),)
+USB_CFLAGS += -DHAVE_LIBUSB
+endif
+
 # ----- compile / link flags ----------------------------------------------
 
 NEW_INCLUDES := -Iinclude -Isrc -Isrc/transport
@@ -68,7 +80,7 @@ endif
 # and leave the linker without a WinMain.
 
 LDFLAGS += -pthread
-LDLIBS  += $(SDL_LIBS) $(PLATFORM_LIBS) -lm
+LDLIBS  += $(SDL_LIBS) $(PLATFORM_LIBS) $(USB_LIBS) -lm
 
 # ----- source lists -------------------------------------------------------
 
@@ -76,7 +88,11 @@ TRANSPORT_SRCS := \
     $(SERIAL_SRC) \
     src/transport/scpi.c \
     src/transport/scpi_serial.c \
-    src/transport/scpi_prologix.c
+    src/transport/scpi_prologix.c \
+    src/transport/scpi_usbtmc.c \
+    src/transport/scpi_vxi11.c \
+    src/transport/scpi_hislip.c \
+    src/transport/net_io.c
 
 DRIVER_SRCS := \
     src/drivers/registry.c \
@@ -126,11 +142,11 @@ psu_probe$(EXE_SUFFIX)_SRCS := \
     src/app/psu_probe.c $(PLATFORM_SRC) $(TRANSPORT_SRCS) $(DRIVER_SRCS)
 
 # psu_probe doesn't link SDL/TTF — keep SDL_CFLAGS off its compile line.
-psu_probe$(EXE_SUFFIX)_LDLIBS   := -pthread $(PLATFORM_LIBS) -lm
-psu_probe$(EXE_SUFFIX)_CPPFLAGS := $(NEW_INCLUDES)
+psu_probe$(EXE_SUFFIX)_LDLIBS   := -pthread $(PLATFORM_LIBS) $(USB_LIBS) -lm
+psu_probe$(EXE_SUFFIX)_CPPFLAGS := $(NEW_INCLUDES) $(USB_CFLAGS)
 
 # psu_app does need SDL; pulled in via CPPFLAGS (not the global CFLAGS).
-psu_app$(EXE_SUFFIX)_CPPFLAGS   := $(NEW_INCLUDES) $(SDL_CFLAGS)
+psu_app$(EXE_SUFFIX)_CPPFLAGS   := $(NEW_INCLUDES) $(SDL_CFLAGS) $(USB_CFLAGS)
 
 # Legacy four GUIs (POSIX only).
 LEGACY_INC := -Ilegacy
