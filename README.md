@@ -4,20 +4,26 @@
 
 A model-agnostic bench-instrument control app in C/SDL2. Builds on Linux
 and Windows from the same source tree. One binary, one
-launcher, **six** UI layouts (four for PSUs, two for DMMs), and a growing set
-of drivers across two instrument classes:
+launcher, **six** UI layouts (four for PSUs, two for DMMs), and **39 built-in
+drivers** (26 PSU + 13 DMM) reachable over **five transports**:
 
-- **PSUs** — Modbus-bridge boards (Riden / DPS-style via ESP32), SCPI
-  supplies (Siglent SPD, Keysight/Agilent/HP E36xxA + classic 663xA, Rigol
-  DP800 family, Rohde & Schwarz HMP / NGE, Keithley 2230G / 2231A),
-  Korad-protocol bench supplies (Korad / TENMA / Velleman / Hanmatek and
-  clones), plus a synthetic demo driver.
-- **DMMs** — OWON XDM-series over USB-serial, classic & Truevolt Keysight/
-  Agilent/HP (34401A, 34461A, 34465A, 34470A), Fluke 884x in 34401A-compat
-  SCPI mode, Keithley 2000 & DMM6500. The Keysight/Fluke/Keithley drivers
-  all reach the instrument via either USB-serial **or** a Prologix
-  GPIB-USB-HPIB adapter (`--port=prologix:/dev/ttyUSB0:<gpib-addr>`).
-  Plus a synthetic demo DMM.
+- **PSUs (26)** — Modbus-bridge boards (Riden / DPS-style via ESP32);
+  SCPI supplies (Siglent SPD with series-tracking; Keysight/Agilent/HP
+  E36xxA + classic 663xA; Rigol DP800 family; Rohde & Schwarz HMP / NGE;
+  Keithley 2230G / 2231A); native HP-IB DCL multi-output system supplies
+  (HP 6622A / 6623A / 6624A / 6625A / 6627A); Korad-protocol bench
+  supplies (Korad / TENMA / Velleman / Hanmatek and clones); plus a
+  synthetic demo driver.
+- **DMMs (13)** — OWON XDM-series over USB-serial; modern SCPI bench
+  meters (Keysight Truevolt 34461A/34465A/34470A + classic 34401A; Fluke
+  8845A/8846A; Keithley 2000 + touchscreen DMM6500); legendary native
+  HP-IB DCL meters (HP 3458A 8½-digit reference, HP 3457A 6½-digit,
+  HP 3478A 5½-digit with F-command set); plus a synthetic demo DMM.
+- **Transports** — `serial:` (POSIX termios / Win32 native), `prologix:`
+  (GPIB-USB-HPIB adapter), `usbtmc:` (Linux kernel `/dev/usbtmcN` **or**
+  cross-platform libusb-1.0 backend), `vxi11:` (hand-rolled ONC RPC over
+  TCP — works against any LAN-capable SCPI instrument), `hislip:` (newer
+  IVI-6.1 LAN protocol on TCP 4880).
 
 The launcher knows the instrument kind: selecting a PSU driver enables the
 PSU views (toolbar-single, toolbar-dual, full-single, full-dual); selecting
