@@ -1,0 +1,32 @@
+Vendored from https://github.com/ocornut/imgui
+
+Branch:  docking
+Commit:  2af6dd9694288e6befe1edb7ce25510911693c22
+
+License: MIT — see LICENSE.txt in this folder.
+
+Files vendored (everything else upstream is not used):
+
+  imgui.cpp
+  imgui.h
+  imconfig.h
+  imgui_internal.h
+  imgui_draw.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  imgui_demo.cpp        (kept for `ImGui::ShowDemoWindow()` debugging)
+  imstb_rectpack.h
+  imstb_textedit.h
+  imstb_truetype.h
+  backends/imgui_impl_sdl2.cpp
+  backends/imgui_impl_sdl2.h
+  backends/imgui_impl_opengl3.cpp
+  backends/imgui_impl_opengl3.h
+  backends/imgui_impl_opengl3_loader.h
+
+To refresh, re-run:
+
+  git clone --depth 1 --branch docking https://github.com/ocornut/imgui.git /tmp/imgui-fetch
+  cp /tmp/imgui-fetch/imgui*.{cpp,h} third_party/imgui/
+  cp /tmp/imgui-fetch/imstb_*.h      third_party/imgui/
+  cp /tmp/imgui-fetch/backends/imgui_impl_sdl{2,renderer2}.{cpp,h} third_party/imgui/backends/
