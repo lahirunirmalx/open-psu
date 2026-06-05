@@ -68,13 +68,6 @@ bool can_launch(launcher_imgui_state *st) {
     return st->dmm_view[st->sel_dmm_view]->run != nullptr;
 }
 
-bool view_is_in_process_capable(const char *view_id) {
-    /* Phase B: only the toolbar views run in-process. Everything else
-     * still goes through fork+exec until ported. */
-    return std::strcmp(view_id, "toolbar-single") == 0
-        || std::strcmp(view_id, "toolbar-dual")   == 0;
-}
-
 void do_launch(launcher_imgui_state *st) {
     const char *drv_id  = nullptr;
     const char *view_id = nullptr;
@@ -92,36 +85,17 @@ void do_launch(launcher_imgui_state *st) {
         is_dmm  = true;
     }
 
-    if (st->mgr && view_is_in_process_capable(view_id)) {
-        /* Open as an in-process ImGui window. */
-        const char *err = nullptr;
-        if (instance_open(st->mgr, is_dmm, drv_id, view_id,
-                          st->port[0] ? st->port : "-", baud, &err)) {
-            set_status(st, 1, "opened %s + %s", drv_id, view_id);
-        } else {
-            set_status(st, 2, "%s", err ? err : "open failed");
-        }
+    if (!st->mgr) {
+        set_status(st, 2, "internal: no instance manager attached");
         return;
     }
 
-    /* Fallback: views that aren't ported yet still spawn a separate
-     * psu_app process via fork+exec. */
-    char a_drv[64], a_view[64], a_port[256], a_baud[32];
-    std::snprintf(a_drv,  sizeof(a_drv),  "--driver=%s", drv_id);
-    std::snprintf(a_view, sizeof(a_view), "--view=%s",   view_id);
-    std::snprintf(a_port, sizeof(a_port), "--port=%s",
-                  st->port[0] ? st->port : "-");
-    std::snprintf(a_baud, sizeof(a_baud), "--baud=%d",   baud);
-
-    char *argv[] = {
-        st->self_exe,
-        a_drv, a_view, a_port, a_baud,
-        nullptr,
-    };
-    if (pl_spawn(st->self_exe, argv)) {
-        set_status(st, 1, "spawned %s + %s (separate process)", drv_id, view_id);
+    const char *err = nullptr;
+    if (instance_open(st->mgr, is_dmm, drv_id, view_id,
+                      st->port[0] ? st->port : "-", baud, &err)) {
+        set_status(st, 1, "opened %s + %s", drv_id, view_id);
     } else {
-        set_status(st, 2, "failed to spawn %s + %s", drv_id, view_id);
+        set_status(st, 2, "%s", err ? err : "open failed");
     }
 }
 

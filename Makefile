@@ -151,8 +151,13 @@ SHELL_SRCS := \
     src/shell/shell.cpp \
     src/shell/launcher_imgui.cpp \
     src/shell/instance.cpp \
+    src/shell/views_imgui/widgets.cpp \
     src/shell/views_imgui/toolbar_single.cpp \
-    src/shell/views_imgui/toolbar_dual.cpp
+    src/shell/views_imgui/toolbar_dual.cpp \
+    src/shell/views_imgui/full_single.cpp \
+    src/shell/views_imgui/full_dual.cpp \
+    src/shell/views_imgui/dmm_toolbar.cpp \
+    src/shell/views_imgui/dmm_full.cpp
 
 # Legacy binaries link directly against POSIX termios; skipped on Windows.
 

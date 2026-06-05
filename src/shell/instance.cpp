@@ -20,21 +20,24 @@ void instance_manager_init(instance_manager_t *mgr) {
     for (int i = 0; i < INSTANCE_MAX; i++) mgr->list[i] = {};
 }
 
+static void free_view_state(instance_t *inst) {
+    if (!inst || !inst->view_state) return;
+    const char *v = inst->view_id;
+    if      (std::strcmp(v, "toolbar-single") == 0) psu_toolbar_single_state_free(inst->view_state);
+    else if (std::strcmp(v, "toolbar-dual")   == 0) psu_toolbar_dual_state_free  (inst->view_state);
+    else if (std::strcmp(v, "full-single")    == 0) psu_full_single_state_free   (inst->view_state);
+    else if (std::strcmp(v, "full-dual")      == 0) psu_full_dual_state_free     (inst->view_state);
+    else if (std::strcmp(v, "dmm-toolbar")    == 0) dmm_toolbar_state_free       (inst->view_state);
+    else if (std::strcmp(v, "dmm-full")       == 0) dmm_full_state_free          (inst->view_state);
+    inst->view_state = nullptr;
+}
+
 void instance_manager_destroy(instance_manager_t *mgr) {
     for (int i = 0; i < mgr->count; i++) {
         instance_t *inst = &mgr->list[i];
-        if (inst->view_state) {
-            /* Dispatch by view_id to free the right struct. */
-            if (std::strcmp(inst->view_id, "toolbar-single") == 0)
-                psu_toolbar_single_state_free(inst->view_state);
-            else if (std::strcmp(inst->view_id, "toolbar-dual") == 0)
-                psu_toolbar_dual_state_free(inst->view_state);
-            inst->view_state = nullptr;
-        }
-        if (inst->psu_drv && inst->psu_drv->close)
-            inst->psu_drv->close(inst->psu_drv);
-        if (inst->dmm_drv && inst->dmm_drv->close)
-            inst->dmm_drv->close(inst->dmm_drv);
+        free_view_state(inst);
+        if (inst->psu_drv && inst->psu_drv->close) inst->psu_drv->close(inst->psu_drv);
+        if (inst->dmm_drv && inst->dmm_drv->close) inst->dmm_drv->close(inst->dmm_drv);
         inst->psu_drv = nullptr;
         inst->dmm_drv = nullptr;
     }
@@ -45,13 +48,7 @@ static void reap_closed(instance_manager_t *mgr) {
     for (int i = 0; i < mgr->count; ) {
         if (mgr->list[i].open) { i++; continue; }
         instance_t *inst = &mgr->list[i];
-        if (inst->view_state) {
-            if (std::strcmp(inst->view_id, "toolbar-single") == 0)
-                psu_toolbar_single_state_free(inst->view_state);
-            else if (std::strcmp(inst->view_id, "toolbar-dual") == 0)
-                psu_toolbar_dual_state_free(inst->view_state);
-            inst->view_state = nullptr;
-        }
+        free_view_state(inst);
         if (inst->psu_drv && inst->psu_drv->close) inst->psu_drv->close(inst->psu_drv);
         if (inst->dmm_drv && inst->dmm_drv->close) inst->dmm_drv->close(inst->dmm_drv);
         /* Shift left. */
@@ -61,10 +58,15 @@ static void reap_closed(instance_manager_t *mgr) {
     }
 }
 
-/* Is this view_id one of the ones already ported to ImGui? */
+/* Is this view_id known to the ImGui instance manager? After Phase C,
+ * every shipping view is. */
 static bool view_is_imgui(const char *view_id) {
-    return std::strcmp(view_id, "toolbar-single") == 0 ||
-           std::strcmp(view_id, "toolbar-dual")   == 0;
+    return std::strcmp(view_id, "toolbar-single") == 0
+        || std::strcmp(view_id, "toolbar-dual")   == 0
+        || std::strcmp(view_id, "full-single")    == 0
+        || std::strcmp(view_id, "full-dual")      == 0
+        || std::strcmp(view_id, "dmm-toolbar")    == 0
+        || std::strcmp(view_id, "dmm-full")       == 0;
 }
 
 bool instance_open(instance_manager_t *mgr,
@@ -130,8 +132,12 @@ bool instance_open(instance_manager_t *mgr,
         }
     }
 
-    if (std::strcmp(view_id, "toolbar-single") == 0)      inst->view_state = psu_toolbar_single_state_new();
-    else if (std::strcmp(view_id, "toolbar-dual") == 0)   inst->view_state = psu_toolbar_dual_state_new();
+    if      (std::strcmp(view_id, "toolbar-single") == 0) inst->view_state = psu_toolbar_single_state_new();
+    else if (std::strcmp(view_id, "toolbar-dual")   == 0) inst->view_state = psu_toolbar_dual_state_new();
+    else if (std::strcmp(view_id, "full-single")    == 0) inst->view_state = psu_full_single_state_new();
+    else if (std::strcmp(view_id, "full-dual")      == 0) inst->view_state = psu_full_dual_state_new();
+    else if (std::strcmp(view_id, "dmm-toolbar")    == 0) inst->view_state = dmm_toolbar_state_new();
+    else if (std::strcmp(view_id, "dmm-full")       == 0) inst->view_state = dmm_full_state_new();
 
     mgr->count++;
     return true;
@@ -141,8 +147,13 @@ void instance_draw_all(instance_manager_t *mgr) {
     for (int i = 0; i < mgr->count; i++) {
         instance_t *inst = &mgr->list[i];
         if (!inst->open) continue;
-        if (std::strcmp(inst->view_id, "toolbar-single") == 0)      psu_toolbar_single_draw(inst);
-        else if (std::strcmp(inst->view_id, "toolbar-dual") == 0)   psu_toolbar_dual_draw(inst);
+        const char *v = inst->view_id;
+        if      (std::strcmp(v, "toolbar-single") == 0) psu_toolbar_single_draw(inst);
+        else if (std::strcmp(v, "toolbar-dual")   == 0) psu_toolbar_dual_draw  (inst);
+        else if (std::strcmp(v, "full-single")    == 0) psu_full_single_draw   (inst);
+        else if (std::strcmp(v, "full-dual")      == 0) psu_full_dual_draw     (inst);
+        else if (std::strcmp(v, "dmm-toolbar")    == 0) dmm_toolbar_draw       (inst);
+        else if (std::strcmp(v, "dmm-full")       == 0) dmm_full_draw          (inst);
     }
     reap_closed(mgr);
 }
