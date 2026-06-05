@@ -149,7 +149,10 @@ endif
 
 SHELL_SRCS := \
     src/shell/shell.cpp \
-    src/shell/launcher_imgui.cpp
+    src/shell/launcher_imgui.cpp \
+    src/shell/instance.cpp \
+    src/shell/views_imgui/toolbar_single.cpp \
+    src/shell/views_imgui/toolbar_dual.cpp
 
 # Legacy binaries link directly against POSIX termios; skipped on Windows.
 

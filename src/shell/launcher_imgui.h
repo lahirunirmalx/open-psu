@@ -16,7 +16,13 @@ extern "C" {
 #include "views/views.h"
 }
 
+struct instance_manager_t;  /* opaque to the launcher; defined in instance.h */
+
 struct launcher_imgui_state {
+    /* The shell creates one of these and hands the launcher a pointer
+     * so LAUNCH can spawn windows in-process. */
+    instance_manager_t *mgr = nullptr;
+
     /* Cached registry pointers + sizes. */
     const psu_driver_factory_t *const *psu_drv = nullptr;
     size_t                             n_psu_drv = 0;

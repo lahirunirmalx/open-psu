@@ -13,6 +13,7 @@
  */
 
 #include "shell.h"
+#include "instance.h"
 #include "launcher_imgui.h"
 
 #include "imgui.h"
@@ -118,7 +119,11 @@ extern "C" int shell_run_launcher(const char *self_exe) {
         return 1;
     }
 
+    instance_manager_t mgr;
+    instance_manager_init(&mgr);
+
     launcher_imgui_state state{};
+    state.mgr = &mgr;
     launcher_imgui_init(&state, self_exe ? self_exe : "psu_app");
 
     bool quit = false;
@@ -139,6 +144,7 @@ extern "C" int shell_run_launcher(const char *self_exe) {
         ImGui::NewFrame();
 
         launcher_imgui_draw(&state);
+        instance_draw_all(&mgr);
         if (state.want_quit) quit = true;
 
         ImGui::Render();
@@ -159,6 +165,7 @@ extern "C" int shell_run_launcher(const char *self_exe) {
         SDL_GL_SwapWindow(win);
     }
 
+    instance_manager_destroy(&mgr);
     shutdown_imgui();
     SDL_GL_DeleteContext(ctx);
     SDL_DestroyWindow(win);
