@@ -20,6 +20,7 @@
 #include "launcher.h"
 #include "platform/platform.h"
 #include "psu_driver.h"
+#include "shell/shell.h"
 #include "views/views.h"
 
 #include <limits.h>
@@ -166,11 +167,19 @@ int main(int argc, char **argv) {
         return 2;
     }
 
-    /* No driver/view picked from the CLI → show launcher. */
+    /* No driver/view picked from the CLI → show launcher.
+     *
+     * Phase A: the new ImGui-based shell is the default. Set
+     * OPENBENCH_LEGACY_LAUNCHER=1 in the env to fall back to the
+     * original SDL-native launcher (kept around until Phase B+ ports
+     * everything). */
     if (!driver_id && !view_id) {
         char self_exe[PATH_MAX];
         resolve_self_exe(argv[0], self_exe, sizeof(self_exe));
-        return launcher_run(self_exe);
+        const char *legacy = getenv("OPENBENCH_LEGACY_LAUNCHER");
+        if (legacy && *legacy && *legacy != '0')
+            return launcher_run(self_exe);
+        return shell_run_launcher(self_exe);
     }
 
     if (!driver_id || !view_id) {

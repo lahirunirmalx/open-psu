@@ -18,6 +18,7 @@
 #   make install               # install psu_app to $(PREFIX)/bin  (POSIX only)
 
 CC      ?= gcc
+CXX     ?= g++
 PREFIX  ?= /usr/local
 BINDIR  ?= $(PREFIX)/bin
 BUILD   ?= build
@@ -67,6 +68,7 @@ endif
 # ----- compile / link flags ----------------------------------------------
 
 NEW_INCLUDES := -Iinclude -Isrc -Isrc/transport
+IMGUI_INCLUDES := -Ithird_party/imgui -Ithird_party/imgui/backends
 
 CFLAGS  ?= -O2
 CFLAGS  += -Wall -Wextra -std=c99 -pthread
@@ -74,13 +76,18 @@ ifeq ($(PLATFORM),posix)
 CFLAGS  += -D_POSIX_C_SOURCE=200809L -D_DEFAULT_SOURCE
 endif
 
+# C++ compile flags for ImGui + the C++ shell. -fno-exceptions / -fno-rtti
+# keep the C++ side small; ImGui doesn't use either.
+CXXFLAGS ?= -O2
+CXXFLAGS += -Wall -Wextra -std=c++17 -pthread -fno-exceptions -fno-rtti
+
 # SDL_CFLAGS is applied per-binary (see *_CPPFLAGS below) so it isn't
 # inherited by binaries that don't link SDL — on Windows it carries the
 # `-Dmain=SDL_main` macro that would otherwise rename psu_probe's main()
 # and leave the linker without a WinMain.
 
 LDFLAGS += -pthread
-LDLIBS  += $(SDL_LIBS) $(PLATFORM_LIBS) $(USB_LIBS) -lm
+LDLIBS  += $(SDL_LIBS) $(GL_LIBS) $(PLATFORM_LIBS) $(USB_LIBS) -lm
 
 # ----- source lists -------------------------------------------------------
 
@@ -120,6 +127,30 @@ VIEW_SRCS := \
     src/views/dmm_toolbar.c \
     src/views/dmm_full.c
 
+# ImGui (Dear ImGui docking branch, vendored under third_party/imgui/).
+# Compiled as C++; linked into psu_app for the new shell-mode launcher.
+IMGUI_SRCS := \
+    third_party/imgui/imgui.cpp \
+    third_party/imgui/imgui_draw.cpp \
+    third_party/imgui/imgui_tables.cpp \
+    third_party/imgui/imgui_widgets.cpp \
+    third_party/imgui/imgui_demo.cpp \
+    third_party/imgui/backends/imgui_impl_sdl2.cpp \
+    third_party/imgui/backends/imgui_impl_opengl3.cpp
+
+# OpenGL link for the ImGui renderer backend. On Linux: -lGL plus -ldl
+# (ImGui's GL loader dlopen()'s libGL.so symbols). On MinGW Windows the
+# loader uses GetProcAddress on opengl32.dll — no dl shim needed.
+ifeq ($(PLATFORM),posix)
+    GL_LIBS := -lGL -ldl
+else
+    GL_LIBS := -lopengl32
+endif
+
+SHELL_SRCS := \
+    src/shell/shell.cpp \
+    src/shell/launcher_imgui.cpp
+
 # Legacy binaries link directly against POSIX termios; skipped on Windows.
 
 # ----- binaries -----------------------------------------------------------
@@ -136,7 +167,8 @@ BINS := $(APP_BINS) $(TOOL_BINS) $(LEGACY_BINS)
 # Per-binary source lists.
 psu_app$(EXE_SUFFIX)_SRCS := \
     src/app/psu_app.c src/app/launcher.c \
-    $(PLATFORM_SRC) $(TRANSPORT_SRCS) $(DRIVER_SRCS) $(VIEW_SRCS)
+    $(PLATFORM_SRC) $(TRANSPORT_SRCS) $(DRIVER_SRCS) $(VIEW_SRCS) \
+    $(IMGUI_SRCS) $(SHELL_SRCS)
 
 psu_probe$(EXE_SUFFIX)_SRCS := \
     src/app/psu_probe.c $(PLATFORM_SRC) $(TRANSPORT_SRCS) $(DRIVER_SRCS)
@@ -146,7 +178,12 @@ psu_probe$(EXE_SUFFIX)_LDLIBS   := -pthread $(PLATFORM_LIBS) $(USB_LIBS) -lm
 psu_probe$(EXE_SUFFIX)_CPPFLAGS := $(NEW_INCLUDES) $(USB_CFLAGS)
 
 # psu_app does need SDL; pulled in via CPPFLAGS (not the global CFLAGS).
-psu_app$(EXE_SUFFIX)_CPPFLAGS   := $(NEW_INCLUDES) $(SDL_CFLAGS) $(USB_CFLAGS)
+# IMGUI_INCLUDES is added so the .cpp files in src/shell/ and the vendored
+# ImGui sources find each other.
+psu_app$(EXE_SUFFIX)_CPPFLAGS   := $(NEW_INCLUDES) $(IMGUI_INCLUDES) $(SDL_CFLAGS) $(USB_CFLAGS)
+
+# Final link goes through g++ so libstdc++ comes in automatically.
+psu_app$(EXE_SUFFIX)_LINK := $(CXX)
 
 # Legacy four GUIs (POSIX only).
 LEGACY_INC := -Ilegacy
@@ -180,14 +217,25 @@ platform:
 	@echo "  build legacy: $(BUILD_LEGACY)"
 
 define BUILD_template
-$(1)_OBJS := $$(patsubst %.c,$(BUILD)/$(1)/%.o,$$($(1)_SRCS))
+# Per-binary object lists, split by source language so each gets the right
+# compiler and flags.
+$(1)_C_SRCS   := $$(filter %.c,$$($(1)_SRCS))
+$(1)_CXX_SRCS := $$(filter %.cpp,$$($(1)_SRCS))
+$(1)_OBJS     := $$(patsubst %.c,$(BUILD)/$(1)/%.o,$$($(1)_C_SRCS)) \
+                 $$(patsubst %.cpp,$(BUILD)/$(1)/%.o,$$($(1)_CXX_SRCS))
 
-$$($(1)_OBJS): $(BUILD)/$(1)/%.o: %.c
+$$(patsubst %.c,$(BUILD)/$(1)/%.o,$$($(1)_C_SRCS)): $(BUILD)/$(1)/%.o: %.c
 	@mkdir -p $$(@D)
 	$$(CC) $$($(1)_CPPFLAGS) $$(CFLAGS) -c $$< -o $$@
 
+$$(patsubst %.cpp,$(BUILD)/$(1)/%.o,$$($(1)_CXX_SRCS)): $(BUILD)/$(1)/%.o: %.cpp
+	@mkdir -p $$(@D)
+	$$(CXX) $$($(1)_CPPFLAGS) $$(CXXFLAGS) -c $$< -o $$@
+
 $(1): $$($(1)_OBJS)
-	$$(CC) $$(LDFLAGS) $$^ -o $$@ $$(if $$($(1)_LDLIBS),$$($(1)_LDLIBS),$$(LDLIBS))
+	$$(if $$($(1)_LINK),$$($(1)_LINK),$$(CC)) \
+	    $$(LDFLAGS) $$^ -o $$@ \
+	    $$(if $$($(1)_LDLIBS),$$($(1)_LDLIBS),$$(LDLIBS))
 endef
 $(foreach bin,$(BINS),$(eval $(call BUILD_template,$(bin))))
 
