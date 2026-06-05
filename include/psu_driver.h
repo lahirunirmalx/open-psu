@@ -1,5 +1,5 @@
 /**
- * psu_driver.h — UI-facing PSU driver interface.
+ * psu_driver.h - UI-facing PSU driver interface.
  *
  * Views (full / single / toolbar) talk only to this interface. Concrete
  * drivers (Modbus bridge, SCPI/Siglent, …) live under drivers/ and implement
@@ -31,15 +31,15 @@ typedef struct {
     float    out_v;          /* Output voltage, V */
     float    out_a;          /* Output current, A */
     float    out_p;          /* Output power, W */
-    float    out_energy_wh;  /* optional — energy delivered, Wh */
+    float    out_energy_wh;  /* optional - energy delivered, Wh */
 
     /* Environment */
-    float    in_v;           /* optional — input/rail voltage, V */
-    float    temp_c;         /* optional — temperature, °C */
+    float    in_v;           /* optional - input/rail voltage, V */
+    float    temp_c;         /* optional - temperature, °C */
 
     /* Timers */
-    uint32_t runtime_s;      /* optional — output-on runtime, s */
-    float    capacity_ah;    /* optional — accumulated Ah */
+    uint32_t runtime_s;      /* optional - output-on runtime, s */
+    float    capacity_ah;    /* optional - accumulated Ah */
 
     /* Protection thresholds (optional) */
     float    ovp;            /* over-voltage protection, V */
@@ -71,7 +71,7 @@ typedef struct {
     bool        supports_energy;
 } psu_caps_t;
 
-/* Driver instance — opened by a factory, used by views, closed by close(). */
+/* Driver instance - opened by a factory, used by views, closed by close(). */
 typedef struct psu_driver psu_driver_t;
 struct psu_driver {
     /* Filled by factory before returning. */

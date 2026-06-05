@@ -1,5 +1,5 @@
 /**
- * Synthetic "demo" driver — pretends to be a 2-channel PSU and produces
+ * Synthetic "demo" driver - pretends to be a 2-channel PSU and produces
  * plausible-looking moving values. Useful when no real hardware is attached
  * and replaces the per-view demo paths that lived in the old code.
  */

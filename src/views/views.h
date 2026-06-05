@@ -1,5 +1,5 @@
 /**
- * Views — the catalogue of UI layouts the launcher can offer.
+ * Views - the catalogue of UI layouts the launcher can offer.
  *
  * Post-Phase-C every view runs in-process via the ImGui shell
  * (src/shell/views_imgui/*); the per-entry .run field that used to

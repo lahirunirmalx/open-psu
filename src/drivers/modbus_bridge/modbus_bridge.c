@@ -1,5 +1,5 @@
 /**
- * Modbus-bridge driver — wraps the existing psu_protocol.c transport so that
+ * Modbus-bridge driver - wraps the existing psu_protocol.c transport so that
  * the rest of the app can talk to it through the generic psu_driver_t vtable.
  *
  * The bridge firmware emits status as scaled integers (V*100, A*1000, …); we
@@ -20,7 +20,7 @@
 #define TEMP_SCALE    10.0f    /* register value = °C    * 10 */
 #define CAP_SCALE     1000.0f  /* register value = Ah    * 1000 */
 
-/* Module-wide assumed hardware limits — Riden RD60xx-class, the bridge's
+/* Module-wide assumed hardware limits - Riden RD60xx-class, the bridge's
  * target. Could be made driver-side configurable later. */
 #define V_MAX         60.0f
 #define I_MAX         20.0f
@@ -83,7 +83,7 @@ static bool mb_set_output(psu_driver_t *self, int ch, bool on) {
 }
 
 static bool mb_set_tracking(psu_driver_t *self, bool on) {
-    /* Underlying protocol's LINK command copies Ch1 to Ch2 — there is no
+    /* Underlying protocol's LINK command copies Ch1 to Ch2 - there is no
      * "untrack" on the wire; passing false is a no-op from the firmware's
      * perspective. We surface it as a one-shot apply when enabled. */
     if (!on) return true;

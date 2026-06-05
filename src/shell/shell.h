@@ -1,5 +1,5 @@
 /**
- * Open LabBench ImGui shell — C ABI for the C parts of the app.
+ * Open LabBench ImGui shell - C ABI for the C parts of the app.
  *
  * The shell hosts an SDL2 + Dear ImGui window, runs the main loop, draws
  * the launcher, and dispatches each open instance to its ImGui view.

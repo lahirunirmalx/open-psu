@@ -1,5 +1,5 @@
 /**
- * dmm_driver.h — UI-facing DMM (digital multimeter) driver interface.
+ * dmm_driver.h - UI-facing DMM (digital multimeter) driver interface.
  *
  * Parallel to psu_driver.h but shaped around meter operations: one
  * measurement at a time, picked from a small set of modes, optionally
@@ -74,7 +74,7 @@ struct dmm_driver {
     bool (*is_connected) (dmm_driver_t *self);
     void (*read)         (dmm_driver_t *self, dmm_reading_t *out);
 
-    /* Setters — return false on transport error. NULL ⇒ not supported. */
+    /* Setters - return false on transport error. NULL ⇒ not supported. */
     bool (*set_mode)     (dmm_driver_t *self, dmm_mode_t mode);
     bool (*set_range)    (dmm_driver_t *self, float range);   /* 0 = auto */
     bool (*set_rate)     (dmm_driver_t *self, dmm_rate_t rate);

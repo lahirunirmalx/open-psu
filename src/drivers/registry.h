@@ -1,5 +1,5 @@
 /**
- * Driver registry — single point that knows every compiled-in driver
+ * Driver registry - single point that knows every compiled-in driver
  * factory (both PSU and DMM). Adding a new model is a one-line change to
  * registry.c.
  */

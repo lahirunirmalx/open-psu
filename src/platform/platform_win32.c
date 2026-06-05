@@ -30,7 +30,7 @@ const char *pl_find_monospace_font(void) {
     const char *windir = getenv("WINDIR");
     if (!windir) windir = "C:\\Windows";
     static const char *const names[] = {
-        "Fonts\\consola.ttf",      /* Consolas — preinstalled, monospace */
+        "Fonts\\consola.ttf",      /* Consolas - preinstalled, monospace */
         "Fonts\\cour.ttf",         /* Courier New */
         "Fonts\\lucon.ttf",        /* Lucida Console */
         NULL,

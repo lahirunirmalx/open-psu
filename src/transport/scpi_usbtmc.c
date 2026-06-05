@@ -1,9 +1,9 @@
 /**
- * USB-TMC transport — two backends share one factory function.
+ * USB-TMC transport - two backends share one factory function.
  *
  * Port-spec accepted forms:
  *
- *   usbtmc:/dev/usbtmc0            Linux kernel `usbtmc` driver — easy +
+ *   usbtmc:/dev/usbtmc0            Linux kernel `usbtmc` driver - easy +
  *                                   stable; needs the udev rule
  *                                   SUBSYSTEM=="usbmisc", KERNEL=="usbtmc*",
  *                                   MODE="0660", GROUP="plugdev"
@@ -161,7 +161,7 @@ typedef struct {
 
 static lusb_state_t *lusb_st(scpi_t *s) { return (lusb_state_t *)s->state; }
 
-/* Parse "<vid>:<pid>[:<serial>]" — returns true on success. */
+/* Parse "<vid>:<pid>[:<serial>]" - returns true on success. */
 static bool parse_vid_pid_serial(const char *spec,
                                  uint16_t *vid_out, uint16_t *pid_out,
                                  char *serial_buf, size_t serial_cap) {
@@ -339,7 +339,7 @@ static scpi_t *open_libusb(const char *spec) {
     uint16_t vid = 0, pid = 0;
     char want_serial[64] = {0};
     if (!parse_vid_pid_serial(spec, &vid, &pid, want_serial, sizeof(want_serial))) {
-        fprintf(stderr, "usbtmc: bad spec '%s' — expected <vid>:<pid>[:<serial>]\n", spec);
+        fprintf(stderr, "usbtmc: bad spec '%s' - expected <vid>:<pid>[:<serial>]\n", spec);
         return NULL;
     }
 

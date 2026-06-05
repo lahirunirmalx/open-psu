@@ -1,5 +1,5 @@
 /**
- * Korad KA-series wire protocol — used by Korad and a long list of Chinese
+ * Korad KA-series wire protocol - used by Korad and a long list of Chinese
  * clones. Quirks vs SCPI / Modbus:
  *
  *  - Commands have NO terminator. We write raw bytes.
@@ -120,7 +120,7 @@ static void *reader_main(void *arg) {
         fprintf(stderr, "korad: identified as: %s\n", idn);
         s->connected = true;
     } else {
-        fprintf(stderr, "korad: *IDN? timed out — continuing anyway\n");
+        fprintf(stderr, "korad: *IDN? timed out - continuing anyway\n");
     }
 
     while (s->running) {

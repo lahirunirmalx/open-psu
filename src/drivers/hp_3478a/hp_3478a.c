@@ -1,5 +1,5 @@
 /**
- * HP 3478A — 5½-digit bench DMM, very popular vintage instrument.
+ * HP 3478A - 5½-digit bench DMM, very popular vintage instrument.
  *
  * Wire dialect: HP single-letter codes, NOT SCPI. There is no *IDN?
  * command; identification is via reading the status byte instead.
@@ -303,8 +303,8 @@ static dmm_driver_t *hp_open(const char *port_spec, int default_baud) {
 
 const dmm_driver_factory_t hp_3478a_factory = {
     .id           = "hp-3478a",
-    .display_name = "HP 3478A — 5½-digit GPIB DMM (F-commands)",
-    .description  = "Single-letter F/R/N/T command set. GPIB-only — use prologix:<dev>:<gpib-addr>.",
+    .display_name = "HP 3478A - 5½-digit GPIB DMM (F-commands)",
+    .description  = "Single-letter F/R/N/T command set. GPIB-only - use prologix:<dev>:<gpib-addr>.",
     .default_baud = 115200,
     .open         = hp_open,
 };

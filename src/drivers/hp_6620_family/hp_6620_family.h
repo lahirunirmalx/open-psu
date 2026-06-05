@@ -1,5 +1,5 @@
 /**
- * HP / Agilent 6620-series "System DC Sources" — multi-output GPIB PSUs.
+ * HP / Agilent 6620-series "System DC Sources" - multi-output GPIB PSUs.
  *
  * Native HP DCL command set (predates SCPI on this family):
  *     VSET <ch>,<v>      ISET <ch>,<a>      OUT <ch>,<0|1>
@@ -9,7 +9,7 @@
  * Reach the instrument via Prologix GPIB-USB-HPIB:
  *     --port=prologix:/dev/ttyUSB0:<gpib-addr>
  *
- * One driver, five factories — each is a different physical model in the
+ * One driver, five factories - each is a different physical model in the
  * 6620-series family with its own channel count and per-channel ranges.
  */
 

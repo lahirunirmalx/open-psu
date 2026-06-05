@@ -118,7 +118,7 @@ bool serial_is_open(serial_port_t *sp) {
 
 /* Win32 doesn't have file descriptors in the POSIX sense. Drivers that
  * used to use serial_get_fd() for select() should use serial_read_bytes()
- * instead — that's the only portable path. */
+ * instead - that's the only portable path. */
 int serial_get_fd(serial_port_t *sp) { (void)sp; return -1; }
 
 bool serial_send_line(serial_port_t *sp, const char *line) {

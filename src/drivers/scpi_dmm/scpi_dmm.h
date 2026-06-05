@@ -1,5 +1,5 @@
 /**
- * Profile-driven SCPI DMM driver — one implementation, many models.
+ * Profile-driven SCPI DMM driver - one implementation, many models.
  *
  * Like scpi_psu, the wire transport is selected by the port-spec string the
  * factory receives, so every model below works over either USB-serial or a
@@ -17,13 +17,13 @@
 
 #include "dmm_driver.h"
 
-/* Keysight/Agilent/HP — classic 34401A and its Truevolt successors. */
+/* Keysight/Agilent/HP - classic 34401A and its Truevolt successors. */
 extern const dmm_driver_factory_t keysight_34401a_factory;   /* 6½ digit */
 extern const dmm_driver_factory_t keysight_34461a_factory;   /* 6½ digit Truevolt */
 extern const dmm_driver_factory_t keysight_34465a_factory;   /* 6½ digit Truevolt mid */
 extern const dmm_driver_factory_t keysight_34470a_factory;   /* 7½ digit Truevolt top */
 
-/* Fluke — 884x family is 34401A-compatible SCPI by default. */
+/* Fluke - 884x family is 34401A-compatible SCPI by default. */
 extern const dmm_driver_factory_t fluke_8845a_factory;       /* 6½ digit */
 extern const dmm_driver_factory_t fluke_8846a_factory;       /* 6½ digit, +4W ohms */
 

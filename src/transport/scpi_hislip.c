@@ -1,5 +1,5 @@
 /**
- * HiSLIP transport (IVI-6.1) — binary-framed SCPI over TCP, port 4880.
+ * HiSLIP transport (IVI-6.1) - binary-framed SCPI over TCP, port 4880.
  *
  * Port-spec:  hislip:<host>[:<port>][:<sub-address>]
  *             defaults: port=4880, sub-address="hislip0"
@@ -8,7 +8,7 @@
  *   - Initialize / InitializeResponse handshake
  *   - Data + DataEnd frames for send
  *   - Data + DataEnd frames for receive
- *   No async channel, no locking, no interrupts, no status queries —
+ *   No async channel, no locking, no interrupts, no status queries -
  *   those aren't needed for plain SCPI send/query.
  *
  * Header layout (every frame, exactly 16 bytes, big-endian):
@@ -32,7 +32,7 @@
 #define HISLIP_DEFAULT_SUBADDR  "hislip0"
 #define HISLIP_VERSION_MAJOR    1
 #define HISLIP_VERSION_MINOR    0
-#define HISLIP_VENDOR_ID        0x4001    /* "LB" — Open LabBench. Just a tag for the server. */
+#define HISLIP_VENDOR_ID        0x4001    /* "LB" - Open LabBench. Just a tag for the server. */
 #define CONNECT_TIMEOUT_MS      3000
 #define IO_TIMEOUT_MS           3000
 #define MAX_FRAME_PAYLOAD       65536

@@ -170,7 +170,7 @@ static psu_driver_t *demo_open(const char *device, int baud) {
 const psu_driver_factory_t demo_factory = {
     .id              = "demo",
     .display_name    = "Demo (synthetic)",
-    .description     = "Synthetic 2-channel PSU — animated values, no hardware required",
+    .description     = "Synthetic 2-channel PSU - animated values, no hardware required",
     .default_baud    = 0,
     .n_channels_hint = 2,
     .open            = demo_open,

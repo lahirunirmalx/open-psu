@@ -1,5 +1,5 @@
 /**
- * psu_probe — minimal CLI utility to exercise the driver layer.
+ * psu_probe - minimal CLI utility to exercise the driver layer.
  *
  * Usage:
  *   psu_probe                     # list registered drivers
@@ -10,7 +10,7 @@
  *   psu_probe modbus-bridge /dev/ttyUSB0 115200 5
  *
  * Prints channel state once per second so you can verify a driver opens,
- * polls, and exposes the right capabilities — without dragging in SDL2.
+ * polls, and exposes the right capabilities - without dragging in SDL2.
  */
 
 #include "drivers/registry.h"

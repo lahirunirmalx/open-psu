@@ -1,5 +1,5 @@
 /**
- * PSU protocol layer — thread-safe, handles streaming data with all registers.
+ * PSU protocol layer - thread-safe, handles streaming data with all registers.
  */
 
 #ifndef PSU_PROTOCOL_H

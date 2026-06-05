@@ -1,5 +1,5 @@
 /**
- * DMM toolbar — ImGui port.
+ * DMM toolbar - ImGui port.
  *
  * One compact window: large primary reading with overload handling,
  * mode label, rate selector. No mode/range buttons here (those live in
@@ -44,7 +44,7 @@ void  dmm_toolbar_draw(instance_t *inst) {
 
     char title[96];
     std::snprintf(title, sizeof(title),
-                  "DMM — %s##inst%d", inst->driver_id, inst->id);
+                  "DMM - %s##inst%d", inst->driver_id, inst->id);
 
     if (s->first_frame) {
         ImGui::SetNextWindowSize(ImVec2(540, 140), ImGuiCond_Once);

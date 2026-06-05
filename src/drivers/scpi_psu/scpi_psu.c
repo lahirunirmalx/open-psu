@@ -1,5 +1,5 @@
 /**
- * Generic SCPI PSU driver — one impl, multiple profiles.
+ * Generic SCPI PSU driver - one impl, multiple profiles.
  *
  * Models that put the channel inside the command (Siglent SPD: "CH1:VOLT 5.0")
  * use channel_in_command=true and format strings carrying both %d (channel)
@@ -52,7 +52,7 @@ typedef struct {
 
     /* Tracking / series/parallel coupling. Both NULL means the driver does
      * not expose set_tracking() and caps.supports_tracking stays false.
-     * If non-NULL the strings have no format specifiers — they are sent
+     * If non-NULL the strings have no format specifiers - they are sent
      * verbatim (no per-channel state, this is a global command).
      *
      * For Siglent SPD3303 series we send OUTP:TRACK 1 (series tracking ON)
@@ -83,7 +83,7 @@ static const scpi_psu_profile_t k_siglent_spd3303 = {
     .meas_voltage_fmt   = "MEAS:VOLT? CH%d",
     .meas_current_fmt   = "MEAS:CURR? CH%d",
     .meas_power_fmt     = "MEAS:POWE? CH%d",
-    /* OUTP:TRACK <0|1|2> — 0=independent, 1=series, 2=parallel.
+    /* OUTP:TRACK <0|1|2> - 0=independent, 1=series, 2=parallel.
      * We toggle series-track on, independent off; user picks parallel via
      * the front panel if needed. Requires the instrument to be in a
      * tracking-capable wiring/mode. */
@@ -156,7 +156,7 @@ static const scpi_psu_profile_t k_keysight_e3645a = {
 };
 
 /* ----- Rigol DP800 family -------------------------------------------------
- * Programming guide: same scheme as Siglent SPD — channel in command, with
+ * Programming guide: same scheme as Siglent SPD - channel in command, with
  * [:SOUR<n>]:VOLT for set and :OUTP CH<n>,ON / :MEAS:VOLT? CH<n> for IO.
  * Verified against the Rigol DP800 Programming Guide command shape. */
 
@@ -192,7 +192,7 @@ static const scpi_psu_profile_t k_rigol_dp832a = {
     .meas_power_fmt     = ":MEAS:POWE? CH%d",
 };
 
-/* DP811 / DP811A — single output, 0..20 V / 0..10 A (or 0..40 V / 0..5 A
+/* DP811 / DP811A - single output, 0..20 V / 0..10 A (or 0..40 V / 0..5 A
  * in low-current range; we expose the 20V/10A nominal range). */
 static const scpi_psu_profile_t k_rigol_dp811 = {
     .model_name = "Rigol DP811",
@@ -229,7 +229,7 @@ static const scpi_psu_profile_t k_rigol_dp711 = {
 /* ----- Rohde & Schwarz HMP / NGE families ---------------------------------
  * Per the HMP / NGE programming manuals: INST OUTn selects the active
  * output, then VOLT/CURR/OUTP:SEL act on it. A master output gate is
- * controlled via OUTP:GEN — we enable it once via init_commands so the
+ * controlled via OUTP:GEN - we enable it once via init_commands so the
  * per-channel selects have effect. */
 
 static const char *const k_rs_init_general_on[] = {
@@ -288,7 +288,7 @@ static const scpi_psu_profile_t k_rs_hmp2030 = {
     .init_commands      = k_rs_init_general_on,
 };
 
-/* NGE100B family — same SCPI shape as HMP, just smaller. NGE103B is 3-ch
+/* NGE100B family - same SCPI shape as HMP, just smaller. NGE103B is 3-ch
  * 32V/3A; NGE102B is the 2-ch variant; NGE101B is single. */
 static const scpi_psu_profile_t k_rs_nge103b = {
     .model_name = "R&S NGE103B",
@@ -310,7 +310,7 @@ static const scpi_psu_profile_t k_rs_nge103b = {
 /* ----- Keithley / Tektronix 2230 series -----------------------------------
  * 2230G / 2231A triple-channel. INST:SEL CH<n> selects, then VOLT/CURR
  * setpoints and CHAN:OUTP enable apply to the selected channel. No
- * MEAS:POWE? on this family — driver computes V*A. */
+ * MEAS:POWE? on this family - driver computes V*A. */
 
 static const scpi_psu_profile_t k_keithley_2230g = {
     .model_name = "Keithley 2230G",
@@ -344,7 +344,7 @@ static const scpi_psu_profile_t k_keithley_2231a = {
     .meas_power_fmt     = NULL,
 };
 
-/* ----- HP / Agilent 663xA — classic GPIB single-output supplies ------------
+/* ----- HP / Agilent 663xA - classic GPIB single-output supplies ------------
  * Identical SCPI shape; only the V/I ranges differ. Defaults match the
  * 6632A (20V/5A), 6633A (50V/2A), 6634A (100V/1A). Common on GPIB; reach
  * via --port=prologix:/dev/ttyUSB0:<gpib-addr>. */
@@ -399,7 +399,7 @@ typedef struct {
     pthread_mutex_t state_lock;
     psu_channel_state_t state[MAX_CHANNELS];
 
-    /* Cached setpoint / output values — instruments often don't report these
+    /* Cached setpoint / output values - instruments often don't report these
      * back symmetrically, so we trust local last-set. */
     float set_v[MAX_CHANNELS];
     float set_a[MAX_CHANNELS];
@@ -484,12 +484,12 @@ static void *reader_main(void *arg) {
         s->connected = true;
         s->rx_count++;
     } else {
-        fprintf(stderr, "scpi-psu: *IDN? timed out — continuing anyway\n");
+        fprintf(stderr, "scpi-psu: *IDN? timed out - continuing anyway\n");
         s->err_count++;
     }
 
     /* Profile-defined one-off setup (e.g. R&S HMP "OUTP:GEN ON"). Failures
-     * are non-fatal — the instrument might already be in the right state. */
+     * are non-fatal - the instrument might already be in the right state. */
     if (s->prof->init_commands) {
         for (const char *const *cmd = s->prof->init_commands; *cmd; cmd++) {
             if (!scpi_send(s->scpi, *cmd)) s->err_count++;
@@ -838,7 +838,7 @@ const psu_driver_factory_t keithley_2231a_factory = {
 const psu_driver_factory_t hp_6632a_factory = {
     .id              = "hp-6632a",
     .display_name    = "HP/Agilent 6632A (SCPI)",
-    .description     = "Single output, 20V/5A. Typically on GPIB — use prologix:<dev>:<addr>.",
+    .description     = "Single output, 20V/5A. Typically on GPIB - use prologix:<dev>:<addr>.",
     .default_baud    = 9600,
     .n_channels_hint = 1,
     .open            = open_hp_6632a,

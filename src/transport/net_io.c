@@ -1,5 +1,5 @@
 /**
- * net_io.c — POSIX socket calls on Linux/macOS, Winsock2 on Windows.
+ * net_io.c - POSIX socket calls on Linux/macOS, Winsock2 on Windows.
  * Compiled into the build regardless of platform; the Windows path
  * activates via _WIN32.
  */

@@ -1,5 +1,5 @@
 /**
- * HP 3458A — the 8½-digit GPIB reference DMM. Native HP command set
+ * HP 3458A - the 8½-digit GPIB reference DMM. Native HP command set
  * (not SCPI), so this driver doesn't ride the scpi_dmm profile table.
  *
  * The 3458A has no native USB; reach it via a Prologix GPIB-USB-HPIB

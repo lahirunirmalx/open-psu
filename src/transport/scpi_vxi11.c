@@ -1,5 +1,5 @@
 /**
- * VXI-11 transport — ONC RPC (Sun RPC) over TCP.
+ * VXI-11 transport - ONC RPC (Sun RPC) over TCP.
  *
  * Port-spec:  vxi11:<host>[:<device-name>]
  *             default device-name = "inst0"
@@ -104,7 +104,7 @@ static uint32_t build_rpc_call(uint8_t *buf, uint8_t **p,
                                uint32_t xid, uint32_t prog,
                                uint32_t vers, uint32_t proc) {
     *p = buf;
-    /* Fragment header — patched in after we know total length. */
+    /* Fragment header - patched in after we know total length. */
     put_u32(p, 0);
     /* RPC call message */
     put_u32(p, xid);          /* xid */
@@ -301,7 +301,7 @@ static bool vxi11_read(vxi11_state_t *t, char *out, size_t outlen, int timeout_m
     put_u32(&p, '\n');                     /* termchar */
     if (!rpc_send(t->sock, buf, p)) return false;
 
-    /* Generous reply buffer — the data field is variable-length. */
+    /* Generous reply buffer - the data field is variable-length. */
     size_t reply_cap = 32 + outlen + 16;
     uint8_t *reply = (uint8_t *)malloc(reply_cap);
     if (!reply) return false;
@@ -360,7 +360,7 @@ scpi_t *scpi_vxi11_open(const char *host, const char *device_name) {
 
     int core_port = portmap_getport(host, VXI11_DEVICE_CORE, VXI11_DEVICE_VERSION);
     if (core_port < 0) {
-        fprintf(stderr, "vxi11: portmap lookup on %s failed — is rpcbind reachable?\n", host);
+        fprintf(stderr, "vxi11: portmap lookup on %s failed - is rpcbind reachable?\n", host);
         return NULL;
     }
     int sock = net_tcp_connect(host, core_port, CONNECT_TIMEOUT_MS);

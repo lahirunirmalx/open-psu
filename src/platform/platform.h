@@ -1,5 +1,5 @@
 /**
- * Thin platform shim — abstracts the handful of POSIX-only APIs the rest
+ * Thin platform shim - abstracts the handful of POSIX-only APIs the rest
  * of the codebase relies on (time, process spawn, self-exe lookup) so the
  * app builds on Linux/macOS AND on Windows (MinGW-w64).
  *
@@ -43,7 +43,7 @@ bool pl_self_exe(char *out, size_t outlen);
  * - POSIX: probes DejaVu Sans Mono / Liberation Mono / Ubuntu Mono in
  *   the standard /usr/share/fonts subtrees.
  * - Win32: probes C:\Windows\Fonts for Consolas / Courier New /
- *   Lucida Console — all pre-installed on Windows 7+.
+ *   Lucida Console - all pre-installed on Windows 7+.
  */
 const char *pl_find_monospace_font(void);
 

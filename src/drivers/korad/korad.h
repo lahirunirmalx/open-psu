@@ -1,5 +1,5 @@
 /**
- * Korad KA-series PSU driver — and the many Chinese clones that speak the
+ * Korad KA-series PSU driver - and the many Chinese clones that speak the
  * same wire protocol (TENMA 72-25xx, Velleman LABPS-3005, Hanmatek HM-3xxP,
  * RND 320-KAxxxxP, Stamos, Korad-USB-style branded units).
  *

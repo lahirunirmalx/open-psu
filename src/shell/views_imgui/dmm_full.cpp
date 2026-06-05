@@ -1,5 +1,5 @@
 /**
- * DMM full — ImGui port.
+ * DMM full - ImGui port.
  *
  * Big primary reading + mode buttons + range cycle + rate selector +
  * mini auto-scaling scope of recent samples.
@@ -23,7 +23,7 @@ struct State {
     float         trace[TRACE_CAP];
     size_t        head = 0;
     size_t        count = 0;
-    /* Current range cycle index per mode — we cycle through a tiny table. */
+    /* Current range cycle index per mode - we cycle through a tiny table. */
     int           range_idx = 0;
     bool          first_frame = true;
 };
@@ -70,7 +70,7 @@ void  dmm_full_draw(instance_t *inst) {
 
     char title[96];
     std::snprintf(title, sizeof(title),
-                  "DMM — %s##inst%d", inst->driver_id, inst->id);
+                  "DMM - %s##inst%d", inst->driver_id, inst->id);
 
     if (s->first_frame) {
         ImGui::SetNextWindowSize(ImVec2(720, 420), ImGuiCond_Once);
@@ -113,7 +113,7 @@ void  dmm_full_draw(instance_t *inst) {
     ImGui::Spacing();
     ImGui::Separator();
 
-    /* Mode buttons — wrap to fit. */
+    /* Mode buttons - wrap to fit. */
     ImGui::TextDisabled("MODE");
     int per_row = 6;
     int n = (int)(sizeof(kModeButtons) / sizeof(kModeButtons[0]));

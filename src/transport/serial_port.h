@@ -42,7 +42,7 @@ int serial_get_fd(serial_port_t *sp);
 bool serial_send_line(serial_port_t *sp, const char *line);
 
 /**
- * Write raw bytes — no line terminator added. For wire protocols that
+ * Write raw bytes - no line terminator added. For wire protocols that
  * don't use line termination (e.g. Korad text protocol). Thread-safe.
  */
 bool serial_write_bytes(serial_port_t *sp, const void *buf, size_t len);

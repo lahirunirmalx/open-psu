@@ -132,7 +132,7 @@ static dmm_driver_t *demo_open(const char *device, int baud) {
 const dmm_driver_factory_t dmm_demo_factory = {
     .id           = "dmm-demo",
     .display_name = "Demo DMM (synthetic)",
-    .description  = "Synthetic 6½-digit DMM — animated readings, no hardware required",
+    .description  = "Synthetic 6½-digit DMM - animated readings, no hardware required",
     .default_baud = 0,
     .open         = demo_open,
 };

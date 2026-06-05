@@ -1,5 +1,5 @@
 /**
- * SCPI client — top-level dispatcher and locked-wrapper API.
+ * SCPI client - top-level dispatcher and locked-wrapper API.
  *
  * Concrete transports live in scpi_serial.c and scpi_prologix.c. Each one
  * exposes an scpi_*_open() factory that fills in the vtable on the returned
@@ -81,7 +81,7 @@ scpi_t *scpi_open(const char *port_spec, int default_baud) {
         char baud_s[16]  = {0};
         if (!next_field(&p, device, sizeof(device)) || !*device) return NULL;
         if (!next_field(&p, addr_s,  sizeof(addr_s))  || !*addr_s) {
-            fprintf(stderr, "scpi: prologix:<dev>:<gpib-addr> — missing GPIB address\n");
+            fprintf(stderr, "scpi: prologix:<dev>:<gpib-addr> - missing GPIB address\n");
             return NULL;
         }
         next_field(&p, baud_s, sizeof(baud_s));
@@ -95,11 +95,11 @@ scpi_t *scpi_open(const char *port_spec, int default_baud) {
     }
 
     if (strcmp(scheme, "usbtmc") == 0) {
-        /* Pass the whole remainder verbatim — the USB-TMC backend handles
+        /* Pass the whole remainder verbatim - the USB-TMC backend handles
          * both "/dev/usbtmc0" and "<vid>:<pid>[:<serial>]" forms and the
          * vid:pid form has its own colon-separators to preserve. */
         if (!p || !*p) {
-            fprintf(stderr, "scpi: usbtmc:<dev>|<vid>:<pid>[:<serial>] — missing target\n");
+            fprintf(stderr, "scpi: usbtmc:<dev>|<vid>:<pid>[:<serial>] - missing target\n");
             return NULL;
         }
         return scpi_usbtmc_open(p);
@@ -109,7 +109,7 @@ scpi_t *scpi_open(const char *port_spec, int default_baud) {
         char host[128] = {0};
         char dev[64]   = {0};
         if (!next_field(&p, host, sizeof(host)) || !*host) {
-            fprintf(stderr, "scpi: vxi11:<host>[:<device>] — missing host\n");
+            fprintf(stderr, "scpi: vxi11:<host>[:<device>] - missing host\n");
             return NULL;
         }
         next_field(&p, dev, sizeof(dev));    /* optional device name */
@@ -121,7 +121,7 @@ scpi_t *scpi_open(const char *port_spec, int default_baud) {
         char port_s[16] = {0};
         char sub[64]    = {0};
         if (!next_field(&p, host, sizeof(host)) || !*host) {
-            fprintf(stderr, "scpi: hislip:<host>[:<port>][:<sub-address>] — missing host\n");
+            fprintf(stderr, "scpi: hislip:<host>[:<port>][:<sub-address>] - missing host\n");
             return NULL;
         }
         next_field(&p, port_s, sizeof(port_s));   /* optional port */

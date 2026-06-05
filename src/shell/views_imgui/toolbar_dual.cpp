@@ -1,5 +1,5 @@
 /**
- * PSU toolbar — dual channel, ImGui port.
+ * PSU toolbar - dual channel, ImGui port.
  *
  * Same widget vocabulary as toolbar_single (big V/A readouts, status,
  * SET popup, OUT button) but two channels side by side in one window.
@@ -149,7 +149,7 @@ void psu_toolbar_dual_draw(instance_t *inst) {
 
     char title[96];
     std::snprintf(title, sizeof(title),
-                  "PSU toolbar dual — %s##inst%d", inst->driver_id, inst->id);
+                  "PSU toolbar dual - %s##inst%d", inst->driver_id, inst->id);
 
     if (s->first_frame) {
         ImGui::SetNextWindowSize(ImVec2(940, 150), ImGuiCond_Once);

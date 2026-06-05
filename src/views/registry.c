@@ -5,25 +5,25 @@
 static const view_def_t k_views[] = {
     {
         .id           = "toolbar-single",
-        .display_name = "Toolbar — single channel",
+        .display_name = "Toolbar - single channel",
         .description  = "Compact strip: V/A readout, ON/OFF, SET popup. One channel.",
         .min_channels = 1,
     },
     {
         .id           = "toolbar-dual",
-        .display_name = "Toolbar — dual channel",
+        .display_name = "Toolbar - dual channel",
         .description  = "Compact strip: CH1+CH2 side by side, large V/A, SET popup per channel.",
         .min_channels = 2,
     },
     {
         .id           = "full-single",
-        .display_name = "Full GUI — single channel",
+        .display_name = "Full GUI - single channel",
         .description  = "VFD readouts, bar meters, temperature, scope, collapsible keypad.",
         .min_channels = 1,
     },
     {
         .id           = "full-dual",
-        .display_name = "Full GUI — dual channel",
+        .display_name = "Full GUI - dual channel",
         .description  = "Dual VFD/bars/scope, shared keypad, TRACKING (driver permitting).",
         .min_channels = 2,
     },
@@ -52,12 +52,12 @@ const view_def_t *views_find(const char *id) {
 static const dmm_view_def_t k_dmm_views[] = {
     {
         .id           = "dmm-toolbar",
-        .display_name = "DMM toolbar — compact readout",
+        .display_name = "DMM toolbar - compact readout",
         .description  = "Big primary reading, mode label, rate indicator. One row.",
     },
     {
         .id           = "dmm-full",
-        .display_name = "DMM full — mode/range/rate + trace",
+        .display_name = "DMM full - mode/range/rate + trace",
         .description  = "Big readout, mode buttons, range cycle, rate selector, recent-trace.",
     },
 };

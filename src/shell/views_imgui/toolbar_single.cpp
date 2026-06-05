@@ -1,5 +1,5 @@
 /**
- * PSU toolbar — single channel, ImGui port.
+ * PSU toolbar - single channel, ImGui port.
  *
  * One compact ImGui window per instance: big V/A readout, status flags
  * (ON/OFF, CV/CC, ERR-if-stale), SET button that opens an inline modal
@@ -7,7 +7,7 @@
  *
  * Layout uses regular ImGui widgets where they fit and drops to
  * SetWindowFontScale for the big readouts. Custom dot-matrix VFD comes
- * later in the full views — toolbar wants the compact look.
+ * later in the full views - toolbar wants the compact look.
  */
 
 #include "views_imgui.h"
@@ -72,7 +72,7 @@ void draw_inline_popup(instance_t *inst, State *s) {
         }
         ImGui::EndPopup();
     } else {
-        /* User clicked outside — treat as cancel. */
+        /* User clicked outside - treat as cancel. */
         s->popup_open = false;
     }
 }
@@ -91,7 +91,7 @@ void psu_toolbar_single_draw(instance_t *inst) {
 
     char title[96];
     std::snprintf(title, sizeof(title),
-                  "PSU toolbar — %s##inst%d", inst->driver_id, inst->id);
+                  "PSU toolbar - %s##inst%d", inst->driver_id, inst->id);
 
     if (s->first_frame) {
         ImGui::SetNextWindowSize(ImVec2(540, 130), ImGuiCond_Once);

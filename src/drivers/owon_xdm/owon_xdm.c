@@ -1,5 +1,5 @@
 /**
- * OWON XDM bench-DMM driver — SCPI over USB-serial.
+ * OWON XDM bench-DMM driver - SCPI over USB-serial.
  *
  * Wire protocol (matches what markusdd/rusty_meter sends):
  *
@@ -12,7 +12,7 @@
  *   CONF:CURR:DC <r>    (r = AUTO | 500E-6 | 5E-3 | 50E-3 | 500E-3 | 5 | 10)
  *   CONF:CURR:AC <r>    same ranges
  *   CONF:RES  <r>       (AUTO | 500 | 5E3 | 50E3 | 500E3 | 5E6 | 50E6)
- *   CONF:FRES <r>       (4-wire, same ranges as RES — XDM2041+ only)
+ *   CONF:FRES <r>       (4-wire, same ranges as RES - XDM2041+ only)
  *   CONF:CAP  <r>       (AUTO | 50E-9 | 500E-9 | 5E-6 | 50E-6 | 500E-6 | 5E-3 | 50E-3)
  *   CONF:FREQ           (no range argument)
  *   CONF:PER
@@ -56,7 +56,7 @@ typedef struct {
     pthread_mutex_t state_lock;
     dmm_reading_t   state;
 
-    /* Cached settings (we don't try to query them back — write-through). */
+    /* Cached settings (we don't try to query them back - write-through). */
     dmm_mode_t mode_cache;
     float      range_cache;
     dmm_rate_t rate_cache;
@@ -225,7 +225,7 @@ static void *reader_main(void *arg) {
         s->connected = true;
         s->rx_count++;
     } else {
-        fprintf(stderr, "owon-xdm: *IDN? timed out — continuing anyway\n");
+        fprintf(stderr, "owon-xdm: *IDN? timed out - continuing anyway\n");
         s->err_count++;
     }
 
@@ -380,7 +380,7 @@ static dmm_driver_t *xdm_open(const char *device, int baud) {
         .supports_range_control = true,
         .display_digits         = 5,
     };
-    /* Modes supported across the XDM1041/1241/2041 family — 4-wire ohms only
+    /* Modes supported across the XDM1041/1241/2041 family - 4-wire ohms only
      * on XDM2041+, but we expose it and let the instrument NAK if absent. */
     d->caps.supports_mode[DMM_MODE_DC_VOLTS]    = true;
     d->caps.supports_mode[DMM_MODE_AC_VOLTS]    = true;

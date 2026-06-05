@@ -1,5 +1,5 @@
 /**
- * Generic SCPI DMM driver — one implementation, many profiles.
+ * Generic SCPI DMM driver - one implementation, many profiles.
  *
  * Wire commands at a glance (Keysight 34401A canonical set; other vendors
  * mostly identical):
@@ -18,7 +18,7 @@
  *   CONF:CONT                    continuity
  *   CONF:TEMP                    temperature (34465A+ / DMM6500)
  *   READ?                        trigger + return one measurement
- *   FUNC?                        quoted current function — e.g. "VOLT" or "VOLT:AC"
+ *   FUNC?                        quoted current function - e.g. "VOLT" or "VOLT:AC"
  *   <func>:NPLC <0.02|1|10>      integration time (rate control)
  *
  * Fluke 884x default to 34401A-compatible SCPI; Keithley DMM6500 needs
@@ -60,7 +60,7 @@ typedef struct {
 
     /* FUNC? reply strings to recognise (case-sensitive, after stripping
      * quotes/whitespace). The alt variant covers vendor punctuation drift
-     * — e.g. Keysight returns "VOLT:AC", Fluke historically "VOLT AC". */
+     * - e.g. Keysight returns "VOLT:AC", Fluke historically "VOLT AC". */
     const char *func_reply    [DMM_MODE_COUNT];
     const char *func_reply_alt[DMM_MODE_COUNT];
 
@@ -80,7 +80,7 @@ typedef struct {
 
 /* ----- profile table ------------------------------------------------------ */
 
-/* Keysight 34401A (and clones — Fluke 884x default to this command set). */
+/* Keysight 34401A (and clones - Fluke 884x default to this command set). */
 #define KEYSIGHT_CLASSIC_CONF \
     [DMM_MODE_DC_VOLTS]    = "CONF:VOLT:DC %s",   \
     [DMM_MODE_AC_VOLTS]    = "CONF:VOLT:AC %s",   \
@@ -131,7 +131,7 @@ static const scpi_dmm_profile_t k_keysight_34401a = {
     .nplc_slow = 10.0f, .nplc_medium = 1.0f, .nplc_fast = 0.02f,
 };
 
-/* Keysight 34461A — Truevolt entry: classic + capacitance. */
+/* Keysight 34461A - Truevolt entry: classic + capacitance. */
 static const scpi_dmm_profile_t k_keysight_34461a = {
     .model_name     = "Keysight 34461A (Truevolt)",
     .display_digits = 6,
@@ -155,7 +155,7 @@ static const scpi_dmm_profile_t k_keysight_34461a = {
     .nplc_slow = 10.0f, .nplc_medium = 1.0f, .nplc_fast = 0.02f,
 };
 
-/* Keysight 34465A — Truevolt mid: + temperature. Same 6½ digit. */
+/* Keysight 34465A - Truevolt mid: + temperature. Same 6½ digit. */
 static const scpi_dmm_profile_t k_keysight_34465a = {
     .model_name     = "Keysight 34465A (Truevolt)",
     .display_digits = 6,
@@ -185,7 +185,7 @@ static const scpi_dmm_profile_t k_keysight_34465a = {
     .nplc_slow = 10.0f, .nplc_medium = 1.0f, .nplc_fast = 0.02f,
 };
 
-/* Keysight 34470A — Truevolt top: 7½ digit, otherwise like 34465A. */
+/* Keysight 34470A - Truevolt top: 7½ digit, otherwise like 34465A. */
 static const scpi_dmm_profile_t k_keysight_34470a = {
     .model_name     = "Keysight 34470A (Truevolt 7½)",
     .display_digits = 7,
@@ -216,7 +216,7 @@ static const scpi_dmm_profile_t k_keysight_34470a = {
     .nplc_slow = 100.0f, .nplc_medium = 1.0f, .nplc_fast = 0.02f,
 };
 
-/* Fluke 8845A — defaults to 34401A-compatible SCPI mode out of the box.
+/* Fluke 8845A - defaults to 34401A-compatible SCPI mode out of the box.
  * Older firmware may emit "VOLT AC" (space) instead of "VOLT:AC"; both are
  * listed via func_reply_alt. */
 static const scpi_dmm_profile_t k_fluke_8845a = {
@@ -239,7 +239,7 @@ static const scpi_dmm_profile_t k_fluke_8845a = {
     .nplc_slow = 10.0f, .nplc_medium = 1.0f, .nplc_fast = 0.02f,
 };
 
-/* Fluke 8846A — 8845A + 4-wire ohms (and a few extras we don't expose yet). */
+/* Fluke 8846A - 8845A + 4-wire ohms (and a few extras we don't expose yet). */
 static const scpi_dmm_profile_t k_fluke_8846a = {
     .model_name     = "Fluke 8846A (34401A-compat SCPI)",
     .display_digits = 6,
@@ -260,7 +260,7 @@ static const scpi_dmm_profile_t k_fluke_8846a = {
     .nplc_slow = 10.0f, .nplc_medium = 1.0f, .nplc_fast = 0.02f,
 };
 
-/* Keithley 2000 — legacy 6½-digit bench DMM, GPIB-centric. */
+/* Keithley 2000 - legacy 6½-digit bench DMM, GPIB-centric. */
 static const scpi_dmm_profile_t k_keithley_2000 = {
     .model_name     = "Keithley 2000",
     .display_digits = 6,
@@ -287,7 +287,7 @@ static const scpi_dmm_profile_t k_keithley_2000 = {
     .nplc_slow = 10.0f, .nplc_medium = 1.0f, .nplc_fast = 0.1f,   /* 2000 floors at ~0.1 NPLC */
 };
 
-/* Keithley DMM6500 — Touch DMM; ensure SCPI mode on connect. */
+/* Keithley DMM6500 - Touch DMM; ensure SCPI mode on connect. */
 static const char *const k_dmm6500_init[] = {
     "*LANG SCPI99",        /* switch out of TSP mode if armed */
     NULL,
@@ -429,7 +429,7 @@ static void *reader_main(void *arg) {
         s->connected = true;
         s->rx_count++;
     } else {
-        fprintf(stderr, "scpi-dmm: *IDN? timed out — continuing anyway\n");
+        fprintf(stderr, "scpi-dmm: *IDN? timed out - continuing anyway\n");
         s->err_count++;
     }
 
@@ -644,7 +644,7 @@ DEF_FACTORY(fluke_8846a, "fluke-8846a",
 
 DEF_FACTORY(keithley_2000, "keithley-2000",
             "Keithley 2000 (SCPI)",
-            "Legacy 6½-digit bench DMM. Typically GPIB — use prologix:<dev>:<addr>.",
+            "Legacy 6½-digit bench DMM. Typically GPIB - use prologix:<dev>:<addr>.",
             9600, k_keithley_2000);
 
 DEF_FACTORY(keithley_dmm6500, "keithley-dmm6500",

@@ -1,5 +1,5 @@
 /**
- * SCPI client — thread-safe send/query against a SCPI-speaking instrument.
+ * SCPI client - thread-safe send/query against a SCPI-speaking instrument.
  *
  * The wire transport is selected by the port spec string passed to
  * scpi_open():
@@ -16,7 +16,7 @@
  *                                    fully-specified HiSLIP
  *   "<naked path>"                   shorthand for "serial:<path>"
  *
- * Drivers (e.g. Siglent SPD) talk only to scpi_t — they don't know whether
+ * Drivers (e.g. Siglent SPD) talk only to scpi_t - they don't know whether
  * they're going over USB-serial directly or through a GPIB controller.
  */
 
@@ -59,7 +59,7 @@ bool scpi_send(scpi_t *s, const char *cmd);
 bool scpi_query(scpi_t *s, const char *cmd, char *out, size_t outlen,
                 int timeout_ms);
 
-/* ---- factory hooks (called by scpi_open) — not for direct use --- */
+/* ---- factory hooks (called by scpi_open) - not for direct use --- */
 
 /* Open a direct-serial SCPI transport. */
 scpi_t *scpi_serial_open(const char *device, int baud);
@@ -69,7 +69,7 @@ scpi_t *scpi_serial_open(const char *device, int baud);
 scpi_t *scpi_prologix_open(const char *device, int baud, int gpib_addr);
 
 /* Open a USB-TMC transport (Linux: /dev/usbtmc*). Returns NULL on Windows
- * for now — the host-side TMC framing isn't implemented there. */
+ * for now - the host-side TMC framing isn't implemented there. */
 scpi_t *scpi_usbtmc_open(const char *device);
 
 /* Open a VXI-11 LAN transport. host = IP or hostname; device_name =

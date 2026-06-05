@@ -1,5 +1,5 @@
 /**
- * HP 3458A — 8½-digit GPIB DMM.
+ * HP 3458A - 8½-digit GPIB DMM.
  *
  * The 3458A's wire dialect is HP's older "DCL" command set, NOT SCPI.
  * Selecting a function and reading a value looks like:
@@ -138,7 +138,7 @@ static float nplc_for_rate(const hp_dcl_profile_t *p, dmm_rate_t r) {
 static void hp_send_setup(hp_state_t *s, const char *cmd) {
     char buf[64];
     /* Use scpi_query so the Prologix's auto-read timeout drains before we
-     * issue the next command — avoids stale data on the serial side. */
+     * issue the next command - avoids stale data on the serial side. */
     if (!scpi_query(s->scpi, cmd, buf, sizeof(buf), SETUP_TIMEOUT_MS)) {
         /* Empty reply is expected for setup commands; not an error. */
     }
@@ -170,7 +170,7 @@ static void *reader_main(void *arg) {
     char idn[160] = {0};
     if (scpi_query(s->scpi, "ID?", idn, sizeof(idn), IDN_TIMEOUT_MS)) {
         /* Native 3458A: ID? returns "HP3458A". Some firmware also accepts
-         * *IDN? — try both for diagnostics. */
+         * *IDN? - try both for diagnostics. */
         fprintf(stderr, "hp-dcl: ID? -> %s", idn);
         if (strchr(idn, '\n') == NULL) fputc('\n', stderr);
         s->connected = true;
@@ -181,7 +181,7 @@ static void *reader_main(void *arg) {
         s->connected = true;
         s->rx_count++;
     } else {
-        fprintf(stderr, "hp-dcl: identification timed out — continuing anyway\n");
+        fprintf(stderr, "hp-dcl: identification timed out - continuing anyway\n");
         s->err_count++;
     }
 
@@ -373,15 +373,15 @@ static dmm_driver_t *open_3457a(const char *p, int b) { return hp_dcl_open(&k_pr
 
 const dmm_driver_factory_t hp_3458a_factory = {
     .id           = "hp-3458a",
-    .display_name = "HP 3458A — 8½-digit GPIB reference DMM",
-    .description  = "HP-language (DCL), not SCPI. GPIB-only — use prologix:<dev>:<gpib-addr>.",
+    .display_name = "HP 3458A - 8½-digit GPIB reference DMM",
+    .description  = "HP-language (DCL), not SCPI. GPIB-only - use prologix:<dev>:<gpib-addr>.",
     .default_baud = 115200,
     .open         = open_3458a,
 };
 
 const dmm_driver_factory_t hp_3457a_factory = {
     .id           = "hp-3457a",
-    .display_name = "HP 3457A — 6½-digit GPIB DMM (DCL)",
+    .display_name = "HP 3457A - 6½-digit GPIB DMM (DCL)",
     .description  = "Predecessor to the 3458A; same DCV/ACV/OHM/OHMF command set, 6½ digit.",
     .default_baud = 115200,
     .open         = open_3457a,

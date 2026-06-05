@@ -1,5 +1,5 @@
 /**
- * psu_app — entry point.
+ * psu_app - entry point.
  *
  * Every UI path now runs through the ImGui shell (src/shell/). The CLI
  * preload args open one instance at startup so script-style invocations

@@ -1,5 +1,5 @@
 /**
- * HP / Agilent 6620-series multi-output system DC sources — native HP DCL
+ * HP / Agilent 6620-series multi-output system DC sources - native HP DCL
  * (predates SCPI on this family). One implementation parameterised by a
  * per-model profile that names the channel count and per-channel V/I
  * limits.
@@ -17,10 +17,10 @@
  *     STS?  <ch>                            status bitmap (we read bit 1
  *                                            = constant-current, bit 0
  *                                            = constant-voltage, bit 7 =
- *                                            output enabled — model-
+ *                                            output enabled - model-
  *                                            specific; refer to manual)
  *
- * GPIB-only — reach via a Prologix controller:
+ * GPIB-only - reach via a Prologix controller:
  *     --port=prologix:/dev/ttyUSB0:<gpib-addr>
  */
 
@@ -49,7 +49,7 @@ typedef struct {
     float i_max[MAX_CHANNELS];
 } hp6620_profile_t;
 
-/* HP 6622A — dual output, 2 × 50V/2A. */
+/* HP 6622A - dual output, 2 × 50V/2A. */
 static const hp6620_profile_t k_prof_6622a = {
     .model_name = "HP 6622A System DC Source (2-output)",
     .n_channels = 2,
@@ -57,7 +57,7 @@ static const hp6620_profile_t k_prof_6622a = {
     .i_max = { 2.0f,  2.0f},
 };
 
-/* HP 6623A — triple output: two 20V/2A + one 50V/0.8A
+/* HP 6623A - triple output: two 20V/2A + one 50V/0.8A
  * (Agilent's standard config; some variants differ). */
 static const hp6620_profile_t k_prof_6623a = {
     .model_name = "HP 6623A System DC Source (3-output)",
@@ -66,7 +66,7 @@ static const hp6620_profile_t k_prof_6623a = {
     .i_max = { 2.0f,  2.0f,  0.8f},
 };
 
-/* HP 6624A — quad output: two 7V/5A + two 20V/2A. */
+/* HP 6624A - quad output: two 7V/5A + two 20V/2A. */
 static const hp6620_profile_t k_prof_6624a = {
     .model_name = "HP 6624A System DC Source (4-output)",
     .n_channels = 4,
@@ -74,7 +74,7 @@ static const hp6620_profile_t k_prof_6624a = {
     .i_max = { 5.0f,   2.0f,  5.0f,  2.0f},
 };
 
-/* HP 6625A — dual output, higher-power per channel: 2 × 50V/1A. */
+/* HP 6625A - dual output, higher-power per channel: 2 × 50V/1A. */
 static const hp6620_profile_t k_prof_6625a = {
     .model_name = "HP 6625A System DC Source (2-output, high-power)",
     .n_channels = 2,
@@ -82,7 +82,7 @@ static const hp6620_profile_t k_prof_6625a = {
     .i_max = { 1.0f,  1.0f},
 };
 
-/* HP 6627A — quad output: 4 × 50V/2A. */
+/* HP 6627A - quad output: 4 × 50V/2A. */
 static const hp6620_profile_t k_prof_6627a = {
     .model_name = "HP 6627A System DC Source (4-output)",
     .n_channels = 4,
@@ -101,7 +101,7 @@ typedef struct {
     pthread_mutex_t state_lock;
     psu_channel_state_t state[MAX_CHANNELS];
 
-    /* Local cache for setpoints / output state — STS? bits are
+    /* Local cache for setpoints / output state - STS? bits are
      * model-specific; trusting our own writes is more portable. */
     float set_v[MAX_CHANNELS];
     float set_a[MAX_CHANNELS];
@@ -148,11 +148,11 @@ static void *reader_main(void *arg) {
         s->connected = true;
         s->rx_count++;
     } else {
-        fprintf(stderr, "hp-6620: ID? timed out — continuing anyway\n");
+        fprintf(stderr, "hp-6620: ID? timed out - continuing anyway\n");
         s->err_count++;
     }
 
-    /* No global init commands needed — DCL leaves the instrument in
+    /* No global init commands needed - DCL leaves the instrument in
      * whatever state the user last set. */
 
     while (s->running) {
@@ -329,26 +329,26 @@ static psu_driver_t *hp_dcl_psu_open(const hp6620_profile_t *prof,
     }
 
 DEF(hp_6622a, "hp-6622a",
-    "HP 6622A — 2-output system DC source (DCL)",
+    "HP 6622A - 2-output system DC source (DCL)",
     "Native HP-IB, not SCPI. 2 × 50V/2A. Use prologix:<dev>:<gpib-addr>.",
     2, k_prof_6622a);
 
 DEF(hp_6623a, "hp-6623a",
-    "HP 6623A — 3-output system DC source (DCL)",
+    "HP 6623A - 3-output system DC source (DCL)",
     "Native HP-IB, not SCPI. 20V/2A x2 + 50V/0.8A. Use prologix:<dev>:<gpib-addr>.",
     3, k_prof_6623a);
 
 DEF(hp_6624a, "hp-6624a",
-    "HP 6624A — 4-output system DC source (DCL)",
+    "HP 6624A - 4-output system DC source (DCL)",
     "Native HP-IB, not SCPI. 7V/5A x2 + 20V/2A x2. Use prologix:<dev>:<gpib-addr>.",
     4, k_prof_6624a);
 
 DEF(hp_6625a, "hp-6625a",
-    "HP 6625A — 2-output high-power system DC source (DCL)",
+    "HP 6625A - 2-output high-power system DC source (DCL)",
     "Native HP-IB, not SCPI. 2 × 50V/1A. Use prologix:<dev>:<gpib-addr>.",
     2, k_prof_6625a);
 
 DEF(hp_6627a, "hp-6627a",
-    "HP 6627A — 4-output system DC source (DCL)",
+    "HP 6627A - 4-output system DC source (DCL)",
     "Native HP-IB, not SCPI. 4 × 50V/2A. Use prologix:<dev>:<gpib-addr>.",
     4, k_prof_6627a);
