@@ -79,19 +79,26 @@ src/
                                     Winsock2) used by scpi_vxi11.c and scpi_hislip.c.
 
   views/
-    views.h                       view_def_t + dmm_view_def_t + entry-point declarations.
-    registry.c                    Lists of compiled-in PSU views and DMM views.
-    toolbar_single.c              PSU compact 1-channel strip.
-    toolbar_dual.c                PSU compact 2-channel strip.
-    full_common.{c,h}             Shared PSU toolkit (VFD readouts, bar/temp/scope, keypad, …).
-    full_single.c                 PSU full GUI — single channel.
-    full_dual.c                   PSU full GUI — dual channel.
-    dmm_toolbar.c                 DMM compact strip readout.
-    dmm_full.c                    DMM full GUI — mode/range/rate buttons + statistics + trace.
+    views.h                       view_def_t + dmm_view_def_t — catalogue only (id +
+                                    display_name + description + min_channels).
+    registry.c                    Compile-time list of PSU and DMM view ids.
 
-legacy/                           The original four standalone PSU GUIs, kept building during the
-                                  refactor as a side-by-side reference. Removed once the new
-                                  full views are validated on hardware.
+  shell/                          Dear ImGui + SDL2 + OpenGL3 host (C++).
+    shell.{h,cpp}                 SDL2 window, GL3 context, ImGui main loop, multi-viewport.
+    launcher_imgui.{h,cpp}        Launcher window: driver/view pickers + PORT field + LAUNCH.
+    instance.{h,cpp}              In-process driver+view lifecycle. INSTANCE_MAX = 32.
+    views_imgui/
+      widgets.{h,cpp}             VFD dot-matrix digit, bar meter, mini scope.
+      toolbar_single.cpp          PSU compact 1-channel strip.
+      toolbar_dual.cpp            PSU compact 2-channel strip.
+      full_single.cpp             PSU full GUI — VFD readouts, setpoint inputs, bar meters, scope.
+      full_dual.cpp               PSU full GUI — two channels side-by-side + TRACKING.
+      dmm_toolbar.cpp             DMM compact readout + rate selector.
+      dmm_full.cpp                DMM full — mode buttons + range cycle + rate + trace.
+
+third_party/imgui/                Vendored Dear ImGui (docking branch). See UPSTREAM
+                                  for the exact commit + refresh recipe. Compiled
+                                  into psu_app; not used by psu_probe.
 
 screenshots/  Makefile  README.md  LICENSE  .gitignore
 ```

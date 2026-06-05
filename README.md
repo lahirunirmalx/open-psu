@@ -191,9 +191,8 @@ Non-SCPI drivers (modbus-bridge, korad-ka) just take the bare device path.
 
 | Binary | Role |
 | ------ | ---- |
-| `psu_app` | Main app. No args → launcher; with `--driver`/`--view` → runs that combination directly (this is what the launcher fork/execs for each new window). |
+| `psu_app` | Main app — ImGui-based shell + launcher. No args → launcher; with `--driver`/`--view` → launcher comes up with that instance already preloaded. Multiple instruments run as ImGui windows in the **same process**; drag any one out and it becomes a real OS window via ImGui multi-viewport. |
 | `psu_probe` | Non-SDL CLI for sanity-checking a driver without launching the GUI. |
-| `psu_gui` / `psu_gui_single` / `psu_gui_toolbar` / `psu_gui_toolbar_single` | Legacy stand-alone GUIs under [`legacy/`](legacy/). Kept building during the refactor so a known-good reference is always available; retired once the matching view runs cleanly inside `psu_app`. |
 
 ---
 
@@ -258,10 +257,9 @@ not currently wired in.
 ### Linux / macOS
 
 ```bash
-make              # everything (psu_app, psu_probe, legacy GUIs)
+make              # everything (psu_app + psu_probe)
 make app          # only psu_app
-make probe        # only psu_probe
-make legacy       # only the four legacy GUIs
+make probe        # only psu_probe (CLI driver sanity tool)
 make platform     # show the auto-detected platform settings
 make clean
 ```
@@ -283,10 +281,10 @@ The Makefile auto-detects `OS=Windows_NT` and:
 - swaps `src/transport/serial_port.c` (POSIX `<termios.h>`) for
   `src/transport/serial_port_win32.c` (CreateFile + SetCommState +
   ReadFile/WriteFile)
-- swaps `src/platform/platform_posix.c` (usleep / gettimeofday / fork /
+- swaps `src/platform/platform_posix.c` (usleep / gettimeofday /
   /proc/self/exe) for `src/platform/platform_win32.c` (Sleep /
-  GetTickCount64 / CreateProcessW / GetModuleFileNameW)
-- skips the four `legacy/` GUIs (they call `tcsetattr` directly)
+  GetTickCount64 / GetModuleFileNameW)
+- links against `opengl32` / `winmm` etc. for the ImGui GL3 backend
 - emits `psu_app.exe` and `psu_probe.exe`
 
 Pre-built Windows binaries land as a CI artifact on every `main` push —
@@ -319,15 +317,11 @@ rewrite to the `\\.\COM10` form.
 
 # Non-GUI driver smoke check
 ./psu_probe modbus-bridge /dev/ttyUSB0
-
-# Legacy binaries (until their views are ported to psu_app)
-./psu_gui_toolbar_single /dev/ttyUSB0
-./psu_gui                /dev/ttyUSB0       # full dual
-./psu_gui_single         /dev/ttyUSB0       # full single
 ```
 
-Run `psu_app` multiple times to open several windows side by side, each with
-its own driver + view combo.
+Each LAUNCH click opens a new ImGui window in the same process. Drag any
+of them out of the launcher window and ImGui's multi-viewport feature
+promotes them to real OS-level windows.
 
 Single-channel views drive **channel 1** of the underlying driver.
 
@@ -353,12 +347,14 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full tree and layering rules.
 Short version:
 
 ```text
-include/psu_driver.h               public driver interface
-src/app/             entry point + SDL launcher + CLI probe
-src/transport/       serial_port, scpi.* (serial + Prologix-GPIB transports)
-src/drivers/         demo, modbus_bridge/, scpi_psu/, korad/  (+ registry)
-src/views/           toolbar_single, toolbar_dual, full_common (full views WIP)
-legacy/              original four standalone GUIs, retired as views are ported
+include/psu_driver.h  + include/dmm_driver.h     public driver interfaces
+src/app/              entry point + CLI probe
+src/transport/        serial_port, scpi (serial / Prologix / USB-TMC / VXI-11 / HiSLIP)
+src/drivers/          demo, modbus_bridge/, scpi_psu/, korad/, scpi_dmm/,
+                      hp_3458a/, hp_3478a/, hp_6620_family/, owon_xdm/  (+ registry)
+src/views/            view catalogue (id, name, description, channel hints)
+src/shell/            ImGui shell + per-view draw routines
+third_party/imgui/    Dear ImGui (docking branch, vendored)
 ```
 
 ---

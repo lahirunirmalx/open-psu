@@ -20,6 +20,10 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_opengl3.h"
 
+extern "C" {
+#include "drivers/registry.h"
+}
+
 #include <SDL.h>
 #include <SDL_opengl.h>
 
@@ -107,7 +111,11 @@ void shutdown_imgui() {
 
 }  // namespace
 
-extern "C" int shell_run_launcher(const char *self_exe) {
+extern "C" int shell_run_launcher(const char *self_exe,
+                                  const char *preload_driver_id,
+                                  const char *preload_view_id,
+                                  const char *preload_port,
+                                  int         preload_baud) {
     SDL_Window   *win = nullptr;
     SDL_GLContext ctx = nullptr;
     if (!init_sdl_and_gl(&win, &ctx)) return 1;
@@ -121,6 +129,20 @@ extern "C" int shell_run_launcher(const char *self_exe) {
 
     instance_manager_t mgr;
     instance_manager_init(&mgr);
+
+    /* Preload (CLI direct-launch path). Look up the driver id in both
+     * registries to decide PSU vs DMM. Failures are reported but
+     * non-fatal — the launcher window still comes up. */
+    if (preload_driver_id && preload_view_id && *preload_driver_id && *preload_view_id) {
+        bool is_dmm = (dmm_drivers_find(preload_driver_id) != nullptr);
+        const char *err = nullptr;
+        const char *port = (preload_port && *preload_port) ? preload_port : "-";
+        if (!instance_open(&mgr, is_dmm,
+                           preload_driver_id, preload_view_id,
+                           port, preload_baud, &err)) {
+            fprintf(stderr, "shell: preload failed: %s\n", err ? err : "(unknown)");
+        }
+    }
 
     launcher_imgui_state state{};
     state.mgr = &mgr;

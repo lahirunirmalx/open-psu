@@ -1,9 +1,11 @@
 /**
  * Open LabBench ImGui shell — C ABI for the C parts of the app.
  *
- * The shell hosts an SDL2 + Dear ImGui window, runs the main loop, and
- * draws the ImGui-based launcher. Phase A: the launcher LAUNCH button
- * still fork/execs psu_app for each opened view (same as before).
+ * The shell hosts an SDL2 + Dear ImGui window, runs the main loop, draws
+ * the launcher, and dispatches each open instance to its ImGui view.
+ *
+ * Pass a non-NULL driver_id + view_id to preload one instance at startup
+ * (used by the CLI direct-launch path `psu_app --driver=… --view=… …`).
  */
 
 #ifndef SHELL_SHELL_H
@@ -13,14 +15,11 @@
 extern "C" {
 #endif
 
-/**
- * Run the ImGui-based launcher. Blocks until the user quits.
- *
- * @param self_exe absolute path of the running psu_app binary, used for
- *                 fork+exec when LAUNCH is clicked.
- * @return 0 on clean exit, non-zero on init failure.
- */
-int shell_run_launcher(const char *self_exe);
+int shell_run_launcher(const char *self_exe,
+                       const char *preload_driver_id,   /* NULL = no preload */
+                       const char *preload_view_id,
+                       const char *preload_port,
+                       int         preload_baud);       /* <= 0 → factory default */
 
 #ifdef __cplusplus
 }

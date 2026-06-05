@@ -27,10 +27,7 @@ void launcher_imgui_init(launcher_imgui_state *st, const char *self_exe) {
     st->dmm_view = dmm_views_list  (&st->n_dmm_view);
     st->sel_kind     = 0;
     st->sel_psu_drv  = st->n_psu_drv > 0 ? 0 : -1;
-    st->sel_psu_view = -1;
-    for (size_t i = 0; i < st->n_psu_view; i++) {
-        if (st->psu_view[i]->run) { st->sel_psu_view = (int)i; break; }
-    }
+    st->sel_psu_view = st->n_psu_view > 0 ? 0 : -1;
     st->sel_dmm_drv  = -1;
     st->sel_dmm_view = -1;
     std::snprintf(st->port, sizeof(st->port), "-");
@@ -60,12 +57,9 @@ bool can_launch(launcher_imgui_state *st) {
     if (st->sel_kind == 0) {
         if (st->sel_psu_drv < 0 || st->sel_psu_view < 0) return false;
         const view_def_t *v = st->psu_view[st->sel_psu_view];
-        if (!v->run) return false;
-        if (v->min_channels > driver_n_channels(st)) return false;
-        return true;
+        return v->min_channels <= driver_n_channels(st);
     }
-    if (st->sel_dmm_drv < 0 || st->sel_dmm_view < 0) return false;
-    return st->dmm_view[st->sel_dmm_view]->run != nullptr;
+    return st->sel_dmm_drv >= 0 && st->sel_dmm_view >= 0;
 }
 
 void do_launch(launcher_imgui_state *st) {
@@ -150,14 +144,11 @@ void draw_view_list(launcher_imgui_state *st) {
     ImGui::Separator();
     for (size_t i = 0; i < st->n_psu_view; i++) {
         const view_def_t *v = st->psu_view[i];
-        bool ported = v->run != nullptr;
-        bool fits   = v->min_channels <= driver_ch;
-        bool enabled = psu_active && ported && fits;
-        bool sel = enabled && ((int)i == st->sel_psu_view);
+        bool fits    = v->min_channels <= driver_ch;
+        bool enabled = psu_active && fits;
+        bool sel     = enabled && ((int)i == st->sel_psu_view);
         char label[160];
-        if (!ported)
-            std::snprintf(label, sizeof(label), "%s   [not yet ported]", v->display_name);
-        else if (psu_active && !fits)
+        if (psu_active && !fits)
             std::snprintf(label, sizeof(label), "%s   [needs %d ch]",
                           v->display_name, v->min_channels);
         else
@@ -178,7 +169,7 @@ void draw_view_list(launcher_imgui_state *st) {
     bool dmm_active = (st->sel_kind == 1);
     for (size_t i = 0; i < st->n_dmm_view; i++) {
         const dmm_view_def_t *v = st->dmm_view[i];
-        bool enabled = dmm_active && v->run != nullptr;
+        bool enabled = dmm_active;
         bool sel = enabled && ((int)i == st->sel_dmm_view);
         if (!enabled) ImGui::BeginDisabled();
         if (ImGui::Selectable(v->display_name, sel)) {
