@@ -1,5 +1,5 @@
 /**
- * Instance manager — see instance.h.
+ * Instance manager - see instance.h.
  */
 
 #include "instance.h"
@@ -17,6 +17,8 @@ extern "C" {
 void instance_manager_init(instance_manager_t *mgr) {
     mgr->count = 0;
     mgr->next_id = 1;
+    mgr->center_x = mgr->center_y = 0;
+    mgr->center_w = mgr->center_h = 0;
     for (int i = 0; i < INSTANCE_MAX; i++) mgr->list[i] = {};
 }
 
@@ -85,7 +87,7 @@ bool instance_open(instance_manager_t *mgr,
     }
     if (!view_is_imgui(view_id)) {
         std::snprintf(err, sizeof(err),
-                      "view '%s' not yet ported to ImGui — use the legacy launcher",
+                      "view '%s' not yet ported to ImGui - use the legacy launcher",
                       view_id);
         if (error_out) *error_out = err;
         return false;
@@ -147,6 +149,16 @@ void instance_draw_all(instance_manager_t *mgr) {
     for (int i = 0; i < mgr->count; i++) {
         instance_t *inst = &mgr->list[i];
         if (!inst->open) continue;
+        /* On first appearance, place each instance window inside the
+         * center region with a small cascade offset based on its id. We
+         * do NOT dock it - users get free-floating draggable windows;
+         * docking is only available if they drag onto a dock target. */
+        if (mgr->center_w > 0 && mgr->center_h > 0) {
+            float stagger = (float)((inst->id - 1) % 8) * 28.0f;
+            ImVec2 pos(mgr->center_x + 24.0f + stagger,
+                       mgr->center_y + 24.0f + stagger);
+            ImGui::SetNextWindowPos(pos, ImGuiCond_FirstUseEver);
+        }
         const char *v = inst->view_id;
         if      (std::strcmp(v, "toolbar-single") == 0) psu_toolbar_single_draw(inst);
         else if (std::strcmp(v, "toolbar-dual")   == 0) psu_toolbar_dual_draw  (inst);

@@ -1,5 +1,5 @@
 /**
- * launcher_imgui.cpp — ImGui draw routine for the launcher.
+ * launcher_imgui.cpp - ImGui draw routine for the launcher.
  *
  * Phase A: same UX as the old launcher.c (driver list with PSU/DMM
  * sections, port field, view list, LAUNCH/QUIT) but rendered with ImGui
@@ -93,9 +93,9 @@ void do_launch(launcher_imgui_state *st) {
     }
 }
 
-void draw_driver_list(launcher_imgui_state *st) {
+void draw_driver_list(launcher_imgui_state *st, float h) {
     ImGui::TextDisabled("DRIVER");
-    ImGui::BeginChild("##drivers", ImVec2(0, -190), true);
+    ImGui::BeginChild("##drivers", ImVec2(0, h), true);
 
     ImGui::TextDisabled("PSU");
     ImGui::Separator();
@@ -133,9 +133,9 @@ void draw_driver_list(launcher_imgui_state *st) {
     ImGui::EndChild();
 }
 
-void draw_view_list(launcher_imgui_state *st) {
+void draw_view_list(launcher_imgui_state *st, float h) {
     ImGui::TextDisabled("VIEW");
-    ImGui::BeginChild("##views", ImVec2(0, -120), true);
+    ImGui::BeginChild("##views", ImVec2(0, h), true);
 
     int driver_ch = driver_n_channels(st);
     bool psu_active = (st->sel_kind == 0);
@@ -194,62 +194,46 @@ void draw_port_and_buttons(launcher_imgui_state *st) {
 
     bool launchable = can_launch(st);
     if (!launchable) ImGui::BeginDisabled();
-    if (ImGui::Button("LAUNCH", ImVec2(140, 32))) {
+    if (ImGui::Button("LAUNCH", ImVec2(-1, 36))) {
         do_launch(st);
     }
     if (!launchable) ImGui::EndDisabled();
 
-    ImGui::SameLine();
-    if (ImGui::Button("QUIT", ImVec2(100, 32))) st->want_quit = true;
+    if (ImGui::Button("QUIT", ImVec2(-1, 28))) st->want_quit = true;
 
-    ImGui::SameLine();
+    ImGui::Spacing();
     ImVec4 col;
     switch (st->status_kind) {
         case 1:  col = ImVec4(0.4f, 0.85f, 0.45f, 1); break;
         case 2:  col = ImVec4(0.95f, 0.35f, 0.35f, 1); break;
         default: col = ImVec4(0.7f, 0.7f, 0.72f, 1); break;
     }
-    ImGui::AlignTextToFramePadding();
-    ImGui::TextColored(col, "  status:  %s", st->status);
+    ImGui::TextDisabled("STATUS");
+    ImGui::TextColored(col, "%s", st->status);
 }
 
 }  // namespace
 
 void launcher_imgui_draw(launcher_imgui_state *st) {
-    /* Fill the whole main viewport. */
-    const ImGuiViewport *vp = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(vp->WorkPos);
-    ImGui::SetNextWindowSize(vp->WorkSize);
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar
-                           | ImGuiWindowFlags_NoCollapse
-                           | ImGuiWindowFlags_NoResize
-                           | ImGuiWindowFlags_NoMove
-                           | ImGuiWindowFlags_NoBringToFrontOnFocus
-                           | ImGuiWindowFlags_NoNavFocus;
-
-    ImGui::Begin("Open LabBench", nullptr, flags);
+    /* Dockable left-sidebar panel. shell.cpp parks it on the left of the
+     * main dockspace; users can still tear it out or resize it. */
+    ImGui::Begin("Launcher", nullptr, ImGuiWindowFlags_NoCollapse);
 
     ImGui::Text("Open LabBench");
-    ImGui::SameLine();
-    ImGui::TextDisabled("— pick driver + view, click LAUNCH to open an instrument window.");
+    ImGui::TextDisabled("Driver + view + port -> LAUNCH");
     ImGui::Separator();
+    ImGui::Spacing();
 
-    /* Two-column layout: drivers on the left, port + views on the right. */
-    if (ImGui::BeginTable("layout", 2, ImGuiTableFlags_BordersInnerV |
-                                        ImGuiTableFlags_Resizable)) {
-        ImGui::TableSetupColumn("##l", ImGuiTableColumnFlags_WidthStretch, 0.45f);
-        ImGui::TableSetupColumn("##r", ImGuiTableColumnFlags_WidthStretch, 0.55f);
+    /* Vertical stack: drivers (45%), views (30%), port+buttons (rest). */
+    float avail = ImGui::GetContentRegionAvail().y;
+    float h_drv = avail * 0.45f;
+    float h_vw  = avail * 0.30f;
 
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        draw_driver_list(st);
-
-        ImGui::TableSetColumnIndex(1);
-        draw_view_list(st);
-
-        ImGui::EndTable();
-    }
-
+    draw_driver_list(st, h_drv);
+    ImGui::Spacing();
+    draw_view_list(st, h_vw);
+    ImGui::Spacing();
+    ImGui::Separator();
     ImGui::Spacing();
     draw_port_and_buttons(st);
 

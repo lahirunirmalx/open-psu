@@ -21,12 +21,16 @@
 float vfd_string(ImDrawList *dl, ImVec2 pos, const char *str,
                  float dot_radius, ImU32 on_col, bool draw_off_pixels);
 
-/* Convenience: same as above but at fixed dot radius 2 — what most
+/* Convenience: same as above but at fixed dot radius 2 - what most
  * legacy callers used. */
 float vfd_digits(ImDrawList *dl, ImVec2 pos, const char *str, ImU32 on_col);
 
 /* Approximate width of a vfd_string rendered at the given dot radius. */
 float vfd_width(const char *str, float dot_radius);
+
+/* Pixel height of a 5x7 VFD glyph at the given dot radius - top of the
+ * topmost dot to bottom of the bottommost dot. Use for vertical centering. */
+float vfd_height(float dot_radius);
 
 /* ---- Bar meter --------------------------------------------------------
  *

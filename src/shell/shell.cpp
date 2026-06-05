@@ -1,10 +1,10 @@
 /**
- * shell.cpp — Dear ImGui + SDL2 + OpenGL 3 host.
+ * shell.cpp - Dear ImGui + SDL2 + OpenGL 3 host.
  *
  * Why OpenGL3 and not the SDL_Renderer backend? ImGui's SDL_Renderer
  * backend uses SDL_RenderGeometry which only landed in SDL 2.0.17, while
  * Ubuntu 20.04 (and the dev box this is being authored on) ships 2.0.10.
- * The OpenGL3 backend has no SDL-version floor — it just needs any GL
+ * The OpenGL3 backend has no SDL-version floor - it just needs any GL
  * context the SDL_GL_* APIs can hand it.
  *
  * One SDL window, one GL context, an ImGui context with viewports
@@ -17,6 +17,7 @@
 #include "launcher_imgui.h"
 
 #include "imgui.h"
+#include "imgui_internal.h"   /* DockBuilder API */
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_opengl3.h"
 
@@ -52,11 +53,12 @@ bool init_sdl_and_gl(SDL_Window **out_win, SDL_GLContext *out_ctx) {
 
     SDL_WindowFlags flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL |
                                               SDL_WINDOW_RESIZABLE |
-                                              SDL_WINDOW_ALLOW_HIGHDPI);
+                                              SDL_WINDOW_ALLOW_HIGHDPI |
+                                              SDL_WINDOW_MAXIMIZED);
     SDL_Window *win = SDL_CreateWindow("Open LabBench",
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
-                                       820, 600, flags);
+                                       1280, 800, flags);
     if (!win) {
         fprintf(stderr, "shell: SDL_CreateWindow failed: %s\n", SDL_GetError());
         SDL_Quit();
@@ -109,6 +111,64 @@ void shutdown_imgui() {
     ImGui::DestroyContext();
 }
 
+/**
+ * Render the IDE-style dockspace host: a borderless window covering the
+ * main viewport, containing one DockSpace. On the first frame we split
+ * it into LEFT (the Launcher pane) + CENTER (where instrument windows
+ * float by default). Returns the screen rect of the central node so
+ * the instance manager knows where to place new windows.
+ */
+ImVec4 draw_ide_dockspace() {
+    ImGuiViewport *vp = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(vp->WorkPos);
+    ImGui::SetNextWindowSize(vp->WorkSize);
+    ImGui::SetNextWindowViewport(vp->ID);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding,   0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,    ImVec2(0, 0));
+
+    ImGuiWindowFlags host_flags = ImGuiWindowFlags_NoTitleBar
+                                | ImGuiWindowFlags_NoCollapse
+                                | ImGuiWindowFlags_NoResize
+                                | ImGuiWindowFlags_NoMove
+                                | ImGuiWindowFlags_NoBringToFrontOnFocus
+                                | ImGuiWindowFlags_NoNavFocus
+                                | ImGuiWindowFlags_NoDocking;
+    ImGui::Begin("##DockHost", nullptr, host_flags);
+    ImGui::PopStyleVar(3);
+
+    ImGuiID dockspace_id = ImGui::GetID("OpenLabBenchDockSpace");
+
+    static ImGuiID center_id = 0;
+    static bool    built     = false;
+    if (!built) {
+        built = true;
+        ImGui::DockBuilderRemoveNode(dockspace_id);
+        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, vp->WorkSize);
+
+        ImGuiID left_id;
+        ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.22f,
+                                    &left_id, &center_id);
+        ImGui::DockBuilderDockWindow("Launcher", left_id);
+        ImGui::DockBuilderFinish(dockspace_id);
+    }
+
+    ImGui::DockSpace(dockspace_id, ImVec2(0, 0), ImGuiDockNodeFlags_None);
+    ImGui::End();
+
+    /* Query the live central-node rect (changes when the user resizes
+     * the launcher pane). Fallback: just use the main viewport. */
+    ImGuiDockNode *central = ImGui::DockBuilderGetNode(center_id);
+    if (central) {
+        return ImVec4(central->Pos.x, central->Pos.y,
+                      central->Size.x, central->Size.y);
+    }
+    return ImVec4(vp->WorkPos.x, vp->WorkPos.y,
+                  vp->WorkSize.x, vp->WorkSize.y);
+}
+
 }  // namespace
 
 extern "C" int shell_run_launcher(const char *self_exe,
@@ -132,7 +192,7 @@ extern "C" int shell_run_launcher(const char *self_exe,
 
     /* Preload (CLI direct-launch path). Look up the driver id in both
      * registries to decide PSU vs DMM. Failures are reported but
-     * non-fatal — the launcher window still comes up. */
+     * non-fatal - the launcher window still comes up. */
     if (preload_driver_id && preload_view_id && *preload_driver_id && *preload_view_id) {
         bool is_dmm = (dmm_drivers_find(preload_driver_id) != nullptr);
         const char *err = nullptr;
@@ -164,6 +224,10 @@ extern "C" int shell_run_launcher(const char *self_exe,
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
+
+        ImVec4 c = draw_ide_dockspace();
+        mgr.center_x = c.x; mgr.center_y = c.y;
+        mgr.center_w = c.z; mgr.center_h = c.w;
 
         launcher_imgui_draw(&state);
         instance_draw_all(&mgr);

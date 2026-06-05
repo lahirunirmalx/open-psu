@@ -1,5 +1,5 @@
 /**
- * widgets.cpp — VFD digits, bar meter, mini scope.
+ * widgets.cpp - VFD digits, bar meter, mini scope.
  *
  * Each helper reserves space with ImGui::Dummy() and paints via
  * ImDrawList. They sit inside any regular ImGui::Window / BeginChild.
@@ -90,6 +90,12 @@ float vfd_string(ImDrawList *dl, ImVec2 pos, const char *str,
 
 float vfd_digits(ImDrawList *dl, ImVec2 pos, const char *str, ImU32 on_col) {
     return vfd_string(dl, pos, str, 2.0f, on_col, true);
+}
+
+float vfd_height(float dot_r) {
+    /* 7 rows: top dot centred at dot_r, bottom dot centred at
+     * 6*(2*dot_r+kDotGap)+dot_r. Total height = bottom + dot_r. */
+    return 14.0f * dot_r + 6.0f * kDotGap;
 }
 
 float vfd_width(const char *str, float dot_r) {
